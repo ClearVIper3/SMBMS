@@ -24,10 +24,6 @@
               <option value="1" selected="selected">男</option>
               <option value="2">女</option>
             </c:when>
-            <c:otherwise>
-              <option value="1">男</option>
-              <option value="2" selected="selected">女</option>
-            </c:otherwise>
           </c:choose>
         </select>
       </div>
