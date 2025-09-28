@@ -5,16 +5,19 @@ import com.viper.pojo.User;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
 
-    public UserServiceImpl() {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        userDao = context.getBean("userDao",UserDao.class);
+    @Autowired
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
     }
 
     @Override

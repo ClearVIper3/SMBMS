@@ -1,9 +1,12 @@
 package com.viper.servlet.user;
 
 import com.viper.pojo.User;
+import com.viper.service.role.RoleServiceImpl;
 import com.viper.service.user.UserService;
 import com.viper.service.user.UserServiceImpl;
 import com.viper.utils.Constants;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,6 +15,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class LoginServlet extends HttpServlet {
+
+    private UserService userService;
+
+    public void init() throws ServletException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        userService = context.getBean("userService", UserService.class);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -22,7 +33,6 @@ public class LoginServlet extends HttpServlet {
         String password = req.getParameter("userPassword");
 
         //和数据库的密码进行比较，调用业务层
-        UserService userService = new UserServiceImpl();
         User user = userService.Login(userCode, password);
 
         if(user != null && user.getUserPassword().equals(password)){//查有此人

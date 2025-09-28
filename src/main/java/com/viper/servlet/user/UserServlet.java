@@ -2,15 +2,14 @@ package com.viper.servlet.user;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
-import com.mysql.cj.xdevapi.JsonArray;
 import com.viper.pojo.Role;
 import com.viper.pojo.User;
 import com.viper.service.role.RoleService;
-import com.viper.service.role.RoleServiceImpl;
 import com.viper.service.user.UserService;
-import com.viper.service.user.UserServiceImpl;
 import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +25,16 @@ import java.util.List;
 
 //实现Servlet复用
 public class UserServlet extends HttpServlet {
+
+    private RoleService roleService;
+    private UserService userService;
+
+    public void init() throws ServletException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        roleService = context.getBean("roleService", RoleService.class);
+        userService = context.getBean("userService", UserService.class);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getParameter("method");
@@ -65,13 +74,12 @@ public class UserServlet extends HttpServlet {
 
         String password = req.getParameter("newpassword");
 
-        Boolean flag = false;
+        Boolean flag;
 
         //System.out.println(attribute != null);
         //System.out.println(!StringUtils.isNullOrEmpty(password));
 
         if(attribute != null && !StringUtils.isNullOrEmpty(password)) {
-            UserService userService = new UserServiceImpl();
             flag = userService.PasswordModify(((User)attribute).getId(), password);
 
             if(flag) {
@@ -140,7 +148,6 @@ public class UserServlet extends HttpServlet {
         int queryUserRole = 0;
 
         //获取用户列表
-        UserService userService = new UserServiceImpl();
 
         //第一次走这个请求，一定是第一页，页面大小固定
         int pageSize = 5; //可优化为CONSTANT
@@ -177,7 +184,6 @@ public class UserServlet extends HttpServlet {
         List<User> userList = userService.getUserList(queryUserName, queryUserRole, currentPageNo, pageSize);
         req.setAttribute("userList", userList);
 
-        RoleService roleService = new RoleServiceImpl();
         List<Role> roleList = roleService.getRoleList();
         req.setAttribute("roleList", roleList);
         req.setAttribute("currentPageNo", currentPageNo);
@@ -195,7 +201,6 @@ public class UserServlet extends HttpServlet {
 
     private void getRoleList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
         List<Role> roleList = null;
-        RoleService roleService = new RoleServiceImpl();
         roleList = roleService.getRoleList();
         //把roleList转换成json对象输出
         resp.setContentType("application/json");
@@ -215,7 +220,6 @@ public class UserServlet extends HttpServlet {
             //如果输入的这个编码为空或者不存在，说明可用
             resultMap.put("userCode", "exist");
         }else{//如果输入的编码不为空，则需要去找一下是否存在这个用户
-            UserService userService = new UserServiceImpl();
             User user = userService.selectUserCodeExist(userCode);
             if(null != user){
                 resultMap.put("userCode","exist");
@@ -264,7 +268,6 @@ public class UserServlet extends HttpServlet {
         user.setCreationDate(new Date());
         //查找当前正在登陆的用户的id
         user.setCreatedBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
-        UserServiceImpl userService = new UserServiceImpl();
         Boolean flag = userService.add(user);
         //如果添加成功，则页面转发，否则重新刷新，再次跳转到当前页面
         if(flag){
@@ -288,7 +291,6 @@ public class UserServlet extends HttpServlet {
         if(delId <= 0){
             resultMap.put("delResult", "notexist");
         }else{
-            UserService userService = new UserServiceImpl();
             if(userService.deleteUserById(delId)){
                 resultMap.put("delResult", "true");
             }else{
@@ -308,7 +310,6 @@ public class UserServlet extends HttpServlet {
         String id = req.getParameter("uid");
         if(!StringUtils.isNullOrEmpty(id)){
             //调用后台方法得到user对象
-            UserService userService = new UserServiceImpl();
             User user = userService.getUserById(id);
             req.setAttribute("user", user);
             req.getRequestDispatcher(url).forward(req, resp);
@@ -344,7 +345,6 @@ public class UserServlet extends HttpServlet {
         user.setModifyDate(new Date());
 
         //调用service层
-        UserServiceImpl userService = new UserServiceImpl();
         Boolean flag = userService.modify(user);
 
         //判断是否修改成功来决定跳转到哪个页面

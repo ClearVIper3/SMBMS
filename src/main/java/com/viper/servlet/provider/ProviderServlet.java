@@ -5,8 +5,9 @@ import com.mysql.cj.util.StringUtils;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;
 import com.viper.service.provider.ProviderService;
-import com.viper.service.provider.ProviderServiceImpl;
 import com.viper.utils.Constants;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +21,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ProviderServlet extends HttpServlet {
+
+    private ProviderService providerService;
+
+    public void init() throws ServletException {
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        providerService = context.getBean("providerService", ProviderService.class);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getParameter("method");
@@ -53,7 +62,6 @@ public class ProviderServlet extends HttpServlet {
             queryProCode = "";
         }
         List<Provider> providerList = new ArrayList<Provider>();
-        ProviderService providerService = new ProviderServiceImpl();
         providerList = providerService.getProviderList(queryProName,queryProCode);
         request.setAttribute("providerList", providerList);
         request.setAttribute("queryProName", queryProName);
@@ -65,7 +73,6 @@ public class ProviderServlet extends HttpServlet {
         String delId = request.getParameter("proid");
         HashMap<String,String> resultMap = new HashMap<String,String>();
         if(!StringUtils.isNullOrEmpty(delId)){
-            ProviderService providerService = new ProviderServiceImpl();
             int flag = providerService.deleteProviderById(delId);
             if(flag == 0){ //删除成功
                 resultMap.put("delResult", "true");
@@ -105,8 +112,7 @@ public class ProviderServlet extends HttpServlet {
         provider.setCreatedBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
         provider.setCreationDate(new Date());
 
-        Boolean flag = false;
-        ProviderService providerService = new ProviderServiceImpl();
+        boolean flag;
         flag = providerService.add(provider);
         if(flag){
             response.sendRedirect(request.getContextPath()+"/jsp/provider.do?method=query");
@@ -118,7 +124,6 @@ public class ProviderServlet extends HttpServlet {
     private void getProviderById(HttpServletRequest request, HttpServletResponse response,String url) throws ServletException, IOException {
         String id = request.getParameter("proid");
         if(!StringUtils.isNullOrEmpty(id)){
-            ProviderService providerService = new ProviderServiceImpl();
             Provider provider = providerService.getProviderById(id);
             request.setAttribute("provider", provider);
             request.getRequestDispatcher(url).forward(request, response);
@@ -144,7 +149,6 @@ public class ProviderServlet extends HttpServlet {
         provider.setModifyBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
         provider.setModifyDate(new Date());
         boolean flag = false;
-        ProviderService providerService = new ProviderServiceImpl();
         flag = providerService.modify(provider);
         if(flag){
             response.sendRedirect(request.getContextPath()+"/jsp/provider.do?method=query");

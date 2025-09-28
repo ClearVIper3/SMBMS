@@ -24,5 +24,5 @@ public interface UserService {
     public User getUserById(String id);
 
     //修改用户信息
-    public Boolean modify(User user) throws Exception;
+    public Boolean modify(User user);
 }

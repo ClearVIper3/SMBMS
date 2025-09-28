@@ -5,11 +5,11 @@ import com.viper.pojo.Bill;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;
 import com.viper.service.bill.BillService;
-import com.viper.service.bill.BillServiceImpl;
 import com.viper.service.provider.ProviderService;
-import com.viper.service.provider.ProviderServiceImpl;
 import com.viper.utils.Constants;
 import com.mysql.cj.util.StringUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,8 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BillServlet extends HttpServlet {
+
+    private BillService billService;
+    private ProviderService providerService;
+
     public void init() throws ServletException {
-        // Put your code here
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        billService = context.getBean("billService", BillService.class);
+        providerService = context.getBean("providerService", ProviderService.class);
     }
     public BillServlet() {
         super();
@@ -76,7 +83,6 @@ public class BillServlet extends HttpServlet {
         System.out.println("getproviderlist ========================= ");
 
         List<Provider> providerList = new ArrayList<Provider>();
-        ProviderService providerService = new ProviderServiceImpl();
         providerList = providerService.getProviderList("","");
 
         //把providerList转换成json对象输出
@@ -90,7 +96,6 @@ public class BillServlet extends HttpServlet {
             throws ServletException, IOException {
         String id = request.getParameter("billid");
         if(!StringUtils.isNullOrEmpty(id)){
-            BillService billService = new BillServiceImpl();
             Bill bill = null;
             bill = billService.getBillById(id);
             request.setAttribute("bill", bill);
@@ -123,7 +128,6 @@ public class BillServlet extends HttpServlet {
         bill.setModifyBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
         bill.setModifyDate(new Date());
         boolean flag = false;
-        BillService billService = new BillServiceImpl();
         flag = billService.modify(bill);
         if(flag){//判断是否修改成功
             response.sendRedirect(request.getContextPath()+"/jsp/bill.do?method=query");
@@ -136,7 +140,6 @@ public class BillServlet extends HttpServlet {
         String id = request.getParameter("billid");
         HashMap<String, String> resultMap = new HashMap<String, String>();
         if(!StringUtils.isNullOrEmpty(id)){
-            BillService billService = new BillServiceImpl();
             boolean flag = billService.deleteBillById(id);
             if(flag){//删除成功
                 resultMap.put("delResult", "true");
@@ -177,7 +180,6 @@ public class BillServlet extends HttpServlet {
         bill.setCreatedBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
         bill.setCreationDate(new Date());
         boolean flag = false;
-        BillService billService = new BillServiceImpl();
         flag = billService.add(bill);
         System.out.println("add flag -- > " + flag);
         if(flag){//判断是否修改成功
@@ -190,7 +192,6 @@ public class BillServlet extends HttpServlet {
             throws ServletException, IOException {
 
         List<Provider> providerList = new ArrayList<Provider>();
-        ProviderService providerService = new ProviderServiceImpl();
         providerList = providerService.getProviderList("","");
         request.setAttribute("providerList", providerList);
 
@@ -202,7 +203,6 @@ public class BillServlet extends HttpServlet {
         }
 
         List<Bill> billList = new ArrayList<Bill>();
-        BillService billService = new BillServiceImpl();
         Bill bill = new Bill();
         if(StringUtils.isNullOrEmpty(queryIsPayment)){
             bill.setIsPayment(0);

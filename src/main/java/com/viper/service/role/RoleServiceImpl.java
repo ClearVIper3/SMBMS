@@ -2,19 +2,22 @@ package com.viper.service.role;
 
 import com.viper.dao.role.RoleDao;
 import com.viper.pojo.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service("roleService")
 public class RoleServiceImpl implements RoleService {
 
     private final RoleDao roleDao;
 
-    public RoleServiceImpl() {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        roleDao = context.getBean("roleDao",RoleDao.class);
+    @Autowired
+    public RoleServiceImpl(RoleDao roleDao) {
+        this.roleDao = roleDao;
     }
 
     @Override

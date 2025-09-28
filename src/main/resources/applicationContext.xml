@@ -11,6 +11,7 @@
 
     <!-- 启用注解扫描 -->
     <context:component-scan base-package="com.viper.dao"/>
+    <context:component-scan base-package="com.viper.service"/>
 
     <import resource="spring-dao.xml"/>
 

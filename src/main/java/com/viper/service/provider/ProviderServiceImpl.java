@@ -3,20 +3,21 @@ package com.viper.service.provider;
 import com.viper.dao.bill.BillDao;
 import com.viper.dao.provider.ProviderDao;
 import com.viper.pojo.Provider;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service("providerService")
 public class ProviderServiceImpl implements ProviderService {
 
     private final ProviderDao providerDao;
     private final BillDao billDao;
 
-    public ProviderServiceImpl(){
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        providerDao = context.getBean("providerDao",ProviderDao.class);
-        billDao = context.getBean("billDao",BillDao.class);
+    @Autowired
+    public ProviderServiceImpl(ProviderDao providerDao, BillDao billDao) {
+        this.providerDao = providerDao;
+        this.billDao = billDao;
     }
 
     @Override

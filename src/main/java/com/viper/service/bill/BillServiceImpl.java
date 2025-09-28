@@ -2,21 +2,21 @@ package com.viper.service.bill;
 
 import com.viper.dao.bill.BillDao;
 import com.viper.pojo.Bill;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service("billService")
 public class BillServiceImpl implements BillService{
 
     private final BillDao billDao;
 
     //业务层都会调用dao层，所以我们要引入Dao层；
-    public BillServiceImpl(){
-        // 缓存ApplicationContext
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        billDao = context.getBean("billDao",BillDao.class);
+    @Autowired
+    public BillServiceImpl(BillDao billDao) {
+        this.billDao = billDao;
     }
 
     public boolean add(Bill bill) {
