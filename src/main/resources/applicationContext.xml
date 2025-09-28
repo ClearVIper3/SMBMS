@@ -2,27 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     https://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/aop
-    https://www.springframework.org/schema/aop/spring-aop.xsd">
+    https://www.springframework.org/schema/aop/spring-aop.xsd
+    http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 启用注解扫描 -->
+    <context:component-scan base-package="com.viper.dao"/>
 
     <import resource="spring-dao.xml"/>
-
-    <bean id="billDao" class="com.viper.dao.bill.BillDaoImpl">
-        <property name="sqlSession" ref="sqlSession"/>
-    </bean>
-
-    <bean id="providerDao" class="com.viper.dao.provider.ProviderDaoImpl">
-        <property name="sqlSession" ref="sqlSession"/>
-    </bean>
-
-    <bean id="roleDao" class="com.viper.dao.role.RoleDaoImpl">
-        <property name="sqlSession" ref="sqlSession"/>
-    </bean>
-
-    <bean id="userDao" class="com.viper.dao.user.UserDaoImpl">
-        <property name="sqlSession" ref="sqlSession"/>
-    </bean>
 
 </beans>

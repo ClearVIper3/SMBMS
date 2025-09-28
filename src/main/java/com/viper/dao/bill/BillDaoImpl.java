@@ -2,13 +2,17 @@ package com.viper.dao.bill;
 
 import com.viper.pojo.Bill;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository("billDao")
 public class BillDaoImpl implements BillDao{
 
-    private SqlSessionTemplate sqlSession;
+    private  SqlSessionTemplate sqlSession;
 
+    @Autowired
     public void setSqlSession(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }

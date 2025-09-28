@@ -2,14 +2,18 @@ package com.viper.dao.user;
 
 import com.viper.pojo.User;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Repository("userDao")
 public class UserDaoImpl implements UserDao{
 
     private SqlSessionTemplate sqlSession;
 
+    @Autowired
     public void setSqlSession(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }

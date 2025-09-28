@@ -2,13 +2,17 @@ package com.viper.dao.provider;
 
 import com.viper.pojo.Provider;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository("providerDao")
 public class ProviderDaoImpl implements ProviderDao {
 
     private SqlSessionTemplate sqlSession;
 
+    @Autowired
     public void setSqlSession(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }
