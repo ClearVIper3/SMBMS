@@ -10,10 +10,10 @@ import java.util.List;
 @Repository("providerDao")
 public class ProviderDaoImpl implements ProviderDao {
 
-    private SqlSessionTemplate sqlSession;
+    private final SqlSessionTemplate sqlSession;
 
     @Autowired
-    public void setSqlSession(SqlSessionTemplate sqlSession) {
+    public ProviderDaoImpl(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }
 

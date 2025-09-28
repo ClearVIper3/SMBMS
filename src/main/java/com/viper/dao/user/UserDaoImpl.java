@@ -11,13 +11,12 @@ import java.util.List;
 @Repository("userDao")
 public class UserDaoImpl implements UserDao{
 
-    private SqlSessionTemplate sqlSession;
+    private final SqlSessionTemplate sqlSession;
 
     @Autowired
-    public void setSqlSession(SqlSessionTemplate sqlSession) {
+    public UserDaoImpl(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }
-
 
     @Override
     public User getLoginUser(String userCode) throws SQLException {

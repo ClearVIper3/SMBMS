@@ -10,10 +10,10 @@ import java.util.List;
 @Repository("billDao")
 public class BillDaoImpl implements BillDao{
 
-    private  SqlSessionTemplate sqlSession;
+    private final SqlSessionTemplate sqlSession;
 
     @Autowired
-    public void setSqlSession(SqlSessionTemplate sqlSession) {
+    public BillDaoImpl(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }
 

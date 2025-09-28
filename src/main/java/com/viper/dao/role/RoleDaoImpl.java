@@ -11,10 +11,10 @@ import java.util.List;
 @Repository("roleDao")
 public class RoleDaoImpl implements RoleDao {
 
-    private SqlSessionTemplate sqlSession;
+    private final SqlSessionTemplate sqlSession;
 
     @Autowired
-    public void setSqlSession(SqlSessionTemplate sqlSession) {
+    public RoleDaoImpl(SqlSessionTemplate sqlSession) {
         this.sqlSession = sqlSession;
     }
 
