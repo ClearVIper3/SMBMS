@@ -8,11 +8,13 @@ import com.viper.service.role.RoleService;
 import com.viper.service.user.UserService;
 import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,51 +25,50 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-//实现Servlet复用
-public class UserController extends HttpServlet {
+@Controller
+@RequestMapping("/jsp/user.do")
+public class UserController{
 
-    private RoleService roleService;
-    private UserService userService;
+    private final RoleService roleService;
+    private final UserService userService;
 
-    public void init() throws ServletException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        roleService = context.getBean("roleService", RoleService.class);
-        userService = context.getBean("userService", UserService.class);
+    @Autowired
+    public UserController(RoleService roleService, UserService userService) {
+        this.roleService = roleService;
+        this.userService = userService;
     }
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String method = req.getParameter("method");
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public void handleRequest(
+            @RequestParam("method") String method,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException{
+
         if (method != null && method.equals("savepwd")) {
-            this.updateUser(req, resp);
+            this.updateUser(request, response);
         } else if (method != null && method.equals("pwdmodify")) {
-            this.pwdModify(req, resp);
+            this.pwdModify(request, response);
         } else if (method != null && method.equals("query")) {
-            this.query(req, resp);
+            this.query(request, response);
         } else if(method != null && method.equals("ucexist")) {
-            this.userCodeExist(req, resp);
+            this.userCodeExist(request, response);
         } else if(method != null && method.equals("getrolelist")) {
-            this.getRoleList(req, resp);
+            this.getRoleList(request, response);
         } else if(method != null && method.equals("add")) {
-            this.add(req,resp);
+            this.add(request, response);
         } else if(method != null && method.equals("deluser")){
-            this.delUser(req,resp);
+            this.delUser(request, response);
         } else if(method != null && method.equals("modify")){
             //通过用户id得到用户
-            this.getUserById(req, resp,"usermodify.jsp");
+            this.getUserById(request, response,"usermodify.jsp");
         } else if(method != null && method.equals("modifyexe")){
-            this.modify(req, resp);
+            this.modify(request, response);
         } else if(method != null && method.equals("view")){
-            this.getUserById(req, resp,"userview.jsp");
+            this.getUserById(request, response,"userview.jsp");
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
-    }
-
-    public void updateUser(HttpServletRequest req, HttpServletResponse resp){
+    private void updateUser(HttpServletRequest req, HttpServletResponse resp){
         Object attribute = req.getSession().getAttribute(Constants.USER_SESSION);
 
         //System.out.println("来了来了label");
@@ -102,7 +103,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-    public void pwdModify(HttpServletRequest req, HttpServletResponse resp){
+    private void pwdModify(HttpServletRequest req, HttpServletResponse resp){
 
         Object o = req.getSession().getAttribute(Constants.USER_SESSION);
         String oldPassword = req.getParameter("oldpassword");
@@ -137,7 +138,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-    public void query(HttpServletRequest req, HttpServletResponse resp){
+    private void query(HttpServletRequest req, HttpServletResponse resp){
 
         //查询用户列表
 

@@ -1,19 +1,26 @@
 package com.viper.controller.user;
 
+import com.viper.pojo.User;
+import com.viper.utils.Constants;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class PwdModifyController extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 正确跳转到 JSP 页面
-        resp.sendRedirect(req.getContextPath() + "/jsp/pwdmodify.jsp");
-    }
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+@Controller
+@RequestMapping("/user/pwdModify")
+public class PwdModifyController{
+
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public void handleRequest(
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException{
+        response.sendRedirect(request.getContextPath() + "/jsp/pwdmodify.jsp");
     }
 }

@@ -8,11 +8,13 @@ import com.viper.service.bill.BillService;
 import com.viper.service.provider.ProviderService;
 import com.viper.utils.Constants;
 import com.mysql.cj.util.StringUtils;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,37 +25,26 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class BillController extends HttpServlet {
+@Controller
+@RequestMapping("/jsp/bill.do")
+public class BillController{
 
-    private BillService billService;
-    private ProviderService providerService;
+    private final BillService billService;
+    private final ProviderService providerService;
 
-    public void init() throws ServletException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-
-        billService = context.getBean("billService", BillService.class);
-        providerService = context.getBean("providerService", ProviderService.class);
-    }
-    public BillController() {
-        super();
-    }
-    public void destroy() {
-        super.destroy();
-    }
-    public static void main(String[] args) {
-        System.out.println(new BigDecimal("23.235").setScale(2,BigDecimal.ROUND_HALF_DOWN));
+    // 构造器注入
+    @Autowired
+    public BillController(BillService billService, ProviderService providerService) {
+        this.billService = billService;
+        this.providerService = providerService;
     }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /*String totalPrice = request.getParameter("totalPrice");
-        //23.234   45
-        BigDecimal totalPriceBigDecimal =
-        //设置规则，小数点保留两位，多出部分，ROUND_DOWN 舍弃
-        //ROUND_HALF_UP 四舍五入(5入) ROUND_UP 进位
-        //ROUND_HALF_DOWN 四舍五入（5不入）
-        new BigDecimal(totalPrice).setScale(2,BigDecimal.ROUND_DOWN);*/
-        String method = request.getParameter("method");
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public void handleRequest(
+            @RequestParam("method") String method,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException{
+
         System.out.println("method----> " + method);
         if(method != null && method.equals("query")){
             this.query(request,response);
@@ -70,13 +61,8 @@ public class BillController extends HttpServlet {
         }else if(method != null && method.equals("getproviderlist")){
             this.getProviderlist(request,response);
         }
-
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
-    }
     private void getProviderlist(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 

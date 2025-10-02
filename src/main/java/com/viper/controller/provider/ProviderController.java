@@ -6,11 +6,13 @@ import com.viper.pojo.Provider;
 import com.viper.pojo.User;
 import com.viper.service.provider.ProviderService;
 import com.viper.utils.Constants;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,36 +22,36 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProviderController extends HttpServlet {
+@Controller
+@RequestMapping("/jsp/provider.do")
+public class ProviderController{
 
-    private ProviderService providerService;
+    private final ProviderService providerService;
 
-    public void init() throws ServletException {
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        providerService = context.getBean("providerService", ProviderService.class);
+    @Autowired
+    public ProviderController(ProviderService providerService) {
+        this.providerService = providerService;
     }
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String method = req.getParameter("method");
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public void handleRequest(
+            @RequestParam("method") String method,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException{
+
         if(method != null && method.equals("query")){
-            this.query(req, resp);
+            this.query(request, response);
         } else if(method != null && method.equals("delprovider")){
-            this.delProvider(req, resp);
+            this.delProvider(request, response);
         } else if(method != null && method.equals("add")){
-            this.add(req, resp);
+            this.add(request, response);
         } else if(method != null && method.equals("view")){
-            this.getProviderById(req,resp,"providerview.jsp");
+            this.getProviderById(request, response,"providerview.jsp");
         } else if(method != null && method.equals("modify")){
-            this.getProviderById(req,resp,"providermodify.jsp");
+            this.getProviderById(request, response,"providermodify.jsp");
         }else if(method != null && method.equals("modifysave")){
-            this.modify(req,resp);
+            this.modify(request, response);
         }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
     }
 
     private void query(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

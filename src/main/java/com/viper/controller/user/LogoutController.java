@@ -1,23 +1,25 @@
 package com.viper.controller.user;
 
 import com.viper.utils.Constants;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class LogoutController extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getSession().removeAttribute(Constants.USER_SESSION);
+@Controller
+@RequestMapping("/user/logout")
+public class LogoutController{
 
-        resp.sendRedirect(req.getContextPath() + "/login.jsp");
-    }
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
+    public void handleRequest(
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException{
+        request.getSession().removeAttribute(Constants.USER_SESSION);
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
     }
 }

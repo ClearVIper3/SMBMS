@@ -3,11 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-         version="4.0"
-         metadata-complete="true">
-
-
-    <absolute-ordering />
+         version="4.0">
 
     <!--欢迎页面-->
     <welcome-file-list>
@@ -42,66 +38,20 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
         <filter-name>SysFilter</filter-name>
         <url-pattern>/jsp/*</url-pattern>
     </filter-mapping>
-    
-    <servlet>
-        <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>com.viper.controller.user.LoginController</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>LoginServlet</servlet-name>
-        <url-pattern>/login.do</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>com.viper.controller.user.LogoutController</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/user/logout</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>PwdModifyServlet</servlet-name>
-        <servlet-class>com.viper.controller.user.PwdModifyController</servlet-class>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>PwdModifyServlet</servlet-name>
-        <url-pattern>/user/pwdModify</url-pattern>
-    </servlet-mapping>
 
-    <!--注册UserServlet页面-->
     <servlet>
-        <servlet-name>UserServlet</servlet-name>
-        <servlet-class>com.viper.controller.user.UserController</servlet-class>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:applicationContext.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
     </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>UserServlet</servlet-name>
-        <url-pattern>/jsp/user.do</url-pattern>
-    </servlet-mapping>
 
-    <!--注册ProviderServlet页面-->
-    <servlet>
-        <servlet-name>ProviderServlet</servlet-name>
-        <servlet-class>com.viper.controller.provider.ProviderController</servlet-class>
-    </servlet>
     <servlet-mapping>
-        <servlet-name>ProviderServlet</servlet-name>
-        <url-pattern>/jsp/provider.do</url-pattern>
-    </servlet-mapping>
-
-    <!--注册BillServlet页面-->
-    <servlet>
-        <servlet-name>BillServlet</servlet-name>
-        <servlet-class>com.viper.controller.bill.BillController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>BillServlet</servlet-name>
-        <url-pattern>/jsp/bill.do</url-pattern>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <session-config>
