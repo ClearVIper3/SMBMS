@@ -1,4 +1,4 @@
-package com.viper.servlet.user;
+package com.viper.controller.user;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 //实现Servlet复用
-public class UserServlet extends HttpServlet {
+public class UserController extends HttpServlet {
 
     private RoleService roleService;
     private UserService userService;

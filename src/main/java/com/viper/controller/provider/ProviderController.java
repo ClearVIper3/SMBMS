@@ -1,4 +1,4 @@
-package com.viper.servlet.provider;
+package com.viper.controller.provider;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProviderServlet extends HttpServlet {
+public class ProviderController extends HttpServlet {
 
     private ProviderService providerService;
 

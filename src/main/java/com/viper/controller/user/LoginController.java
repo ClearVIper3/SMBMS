@@ -1,4 +1,4 @@
-package com.viper.servlet.user;
+package com.viper.controller.user;
 
 import com.viper.pojo.User;
 import com.viper.service.user.UserService;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class LoginServlet extends HttpServlet {
+public class LoginController extends HttpServlet {
 
     private UserService userService;
 

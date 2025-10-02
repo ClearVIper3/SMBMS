@@ -13,14 +13,23 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
-    
+
+    <!--解决乱码问题的过滤器-->
     <filter>
-        <filter-name>EncodingCharacterFilter</filter-name>
-        <filter-class>com.viper.filter.EncodingCharacterFilter</filter-class>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
     </filter>
 
     <filter-mapping>
-        <filter-name>EncodingCharacterFilter</filter-name>
+        <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
@@ -36,7 +45,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>com.viper.servlet.user.LoginServlet</servlet-class>
+        <servlet-class>com.viper.controller.user.LoginController</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -46,7 +55,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>com.viper.servlet.user.LogoutServlet</servlet-class>
+        <servlet-class>com.viper.controller.user.LogoutController</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -56,7 +65,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     
     <servlet>
         <servlet-name>PwdModifyServlet</servlet-name>
-        <servlet-class>com.viper.servlet.user.PwdModifyServlet</servlet-class>
+        <servlet-class>com.viper.controller.user.PwdModifyController</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -67,7 +76,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     <!--注册UserServlet页面-->
     <servlet>
         <servlet-name>UserServlet</servlet-name>
-        <servlet-class>com.viper.servlet.user.UserServlet</servlet-class>
+        <servlet-class>com.viper.controller.user.UserController</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -78,7 +87,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     <!--注册ProviderServlet页面-->
     <servlet>
         <servlet-name>ProviderServlet</servlet-name>
-        <servlet-class>com.viper.servlet.provider.ProviderServlet</servlet-class>
+        <servlet-class>com.viper.controller.provider.ProviderController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ProviderServlet</servlet-name>
@@ -88,7 +97,7 @@ http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
     <!--注册BillServlet页面-->
     <servlet>
         <servlet-name>BillServlet</servlet-name>
-        <servlet-class>com.viper.servlet.bill.BillServlet</servlet-class>
+        <servlet-class>com.viper.controller.bill.BillController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>BillServlet</servlet-name>

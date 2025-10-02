@@ -1,4 +1,4 @@
-package com.viper.servlet.bill;
+package com.viper.controller.bill;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.viper.pojo.Bill;
@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class BillServlet extends HttpServlet {
+public class BillController extends HttpServlet {
 
     private BillService billService;
     private ProviderService providerService;
@@ -34,7 +34,7 @@ public class BillServlet extends HttpServlet {
         billService = context.getBean("billService", BillService.class);
         providerService = context.getBean("providerService", ProviderService.class);
     }
-    public BillServlet() {
+    public BillController() {
         super();
     }
     public void destroy() {
