@@ -3,8 +3,6 @@ package com.viper.service.role;
 import com.viper.dao.role.RoleDao;
 import com.viper.pojo.Role;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
