@@ -1,6 +1,6 @@
 package com.viper.service.role;
 
-import com.viper.dao.role.RoleDao;
+import com.viper.dao.role.RoleMapper;
 import com.viper.pojo.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,11 +11,11 @@ import java.util.List;
 @Service("roleService")
 public class RoleServiceImpl implements RoleService {
 
-    private final RoleDao roleDao;
+    private final RoleMapper roleMapper;
 
     @Autowired
-    public RoleServiceImpl(RoleDao roleDao) {
-        this.roleDao = roleDao;
+    public RoleServiceImpl(RoleMapper roleMapper) {
+        this.roleMapper = roleMapper;
     }
 
     @Override
@@ -23,7 +23,7 @@ public class RoleServiceImpl implements RoleService {
         List<Role> roles = null;
 
         try{
-            roles = roleDao.getRoleList();
+            roles = roleMapper.getRoleList();
         } catch(SQLException e){
             e.printStackTrace();
         }

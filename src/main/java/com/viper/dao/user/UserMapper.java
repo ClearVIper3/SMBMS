@@ -3,11 +3,10 @@ package com.viper.dao.user;
 import com.viper.pojo.User;
 import org.apache.ibatis.annotations.Param;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface UserDao {
+public interface UserMapper {
     //得到登录的用户
     //String userPassword
     public User getLoginUser(@Param("userCode") String userCode) throws SQLException;

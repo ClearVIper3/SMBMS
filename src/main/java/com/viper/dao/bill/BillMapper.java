@@ -4,10 +4,9 @@ import com.viper.pojo.Bill;
 import org.apache.ibatis.annotations.Param;
 
 
-import java.sql.Connection;
 import java.util.List;
 
-public interface BillDao {
+public interface BillMapper {
     /**
      * 增加订单
      * @param bill

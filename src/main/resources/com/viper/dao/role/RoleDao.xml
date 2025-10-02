@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.viper.dao.role.RoleDao">
+<mapper namespace="com.viper.dao.role.RoleMapper">
     <select id="getRoleList" resultType="role">
         select * from smbms_role
     </select>

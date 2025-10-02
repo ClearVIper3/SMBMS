@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.viper.dao.user.UserDao">
+<mapper namespace="com.viper.dao.user.UserMapper">
     <select id="getLoginUser" parameterType="string" resultType="user">
         select * from smbms_user where userCode = #{userCode}
     </select>

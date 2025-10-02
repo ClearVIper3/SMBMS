@@ -3,10 +3,9 @@ package com.viper.dao.provider;
 import com.viper.pojo.Provider;
 import org.apache.ibatis.annotations.Param;
 
-import java.sql.Connection;
 import java.util.List;
 
-public interface ProviderDao {
+public interface ProviderMapper {
     /**
      * 增加供应商
      * @param provider

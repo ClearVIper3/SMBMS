@@ -1,6 +1,6 @@
 package com.viper.service.bill;
 
-import com.viper.dao.bill.BillDao;
+import com.viper.dao.bill.BillMapper;
 import com.viper.pojo.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,19 +11,19 @@ import java.util.List;
 @Service("billService")
 public class BillServiceImpl implements BillService{
 
-    private final BillDao billDao;
+    private final BillMapper billMapper;
 
     //业务层都会调用dao层，所以我们要引入Dao层；
     @Autowired
-    public BillServiceImpl(BillDao billDao) {
-        this.billDao = billDao;
+    public BillServiceImpl(BillMapper billMapper) {
+        this.billMapper = billMapper;
     }
 
     public boolean add(Bill bill) {
 
         boolean flag = false;
         try {
-            int updateRows = billDao.add(bill);
+            int updateRows = billMapper.add(bill);
             System.out.println("dao--------修改行数 " + updateRows);
             if(updateRows > 0){
                 flag = true;
@@ -45,7 +45,7 @@ public class BillServiceImpl implements BillService{
         System.out.println("query providerId ---- > " + bill.getProviderId());
         System.out.println("query isPayment ---- > " + bill.getIsPayment());
         try {
-            billList=billDao.getBillList(bill);
+            billList= billMapper.getBillList(bill);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,7 +57,7 @@ public class BillServiceImpl implements BillService{
         boolean flag=false;
         int delNum;
         try {
-            delNum=billDao.deleteBillById(delId);
+            delNum= billMapper.deleteBillById(delId);
             if(delNum>0){
                 flag=true;
             }
@@ -71,7 +71,7 @@ public class BillServiceImpl implements BillService{
 
         Bill bill = new Bill();
         try {
-            bill = billDao.getBillById(id);
+            bill = billMapper.getBillById(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +83,7 @@ public class BillServiceImpl implements BillService{
         boolean flag=false;
         int modifyNum;
         try {
-            modifyNum=billDao.modify(bill);
+            modifyNum= billMapper.modify(bill);
             if(modifyNum>0){
                 flag=true;
             }

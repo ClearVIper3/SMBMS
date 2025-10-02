@@ -1,23 +1,21 @@
 package com.viper.service.user;
 
-import com.viper.dao.user.UserDao;
+import com.viper.dao.user.UserMapper;
 import com.viper.pojo.User;
 import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserMapper userMapper) {
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -25,7 +23,7 @@ public class UserServiceImpl implements UserService {
 
         boolean flag=false;
         try {
-            int updateNum = userDao.modify(user);//执行修改sql
+            int updateNum = userMapper.modify(user);//执行修改sql
             if(updateNum>0){
                 flag=true;
                 System.out.println("修改用户成功");
@@ -45,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
         User user = null;
         try{
-            user = userDao.getLoginUser(userCode);
+            user = userMapper.getLoginUser(userCode);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -58,7 +56,7 @@ public class UserServiceImpl implements UserService {
         //System.out.println("Service" + password);
         boolean flag;
         try {
-            flag = userDao.UserPasswordModify(id, password) > 0;
+            flag = userMapper.UserPasswordModify(id, password) > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +69,7 @@ public class UserServiceImpl implements UserService {
         int count = 0;
 
         try{
-            count = userDao.getUserCount(username, userRole);
+            count = userMapper.getUserCount(username, userRole);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -89,7 +87,7 @@ public class UserServiceImpl implements UserService {
         System.out.println("currentPageNo ---- > " + currentPageNo);
         System.out.println("pageSize ---- > " + pageSize);
         try {
-            userList = userDao.getUserList(queryUserName,queryUserRole,startIndex,pageSize);
+            userList = userMapper.getUserList(queryUserName,queryUserRole,startIndex,pageSize);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,7 +99,7 @@ public class UserServiceImpl implements UserService {
         User user = null;
 
         try {
-            user = userDao.getLoginUser(userCode);
+            user = userMapper.getLoginUser(userCode);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,7 +112,7 @@ public class UserServiceImpl implements UserService {
         boolean flag = false;
 
         try {
-            int updateRows = userDao.add(user);
+            int updateRows = userMapper.add(user);
             if(updateRows > 0){
                 flag = true;
                 System.out.println("add success!");
@@ -134,7 +132,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
 
         try {
-            user = userDao.getUserById(id);
+            user = userMapper.getUserById(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,7 +144,7 @@ public class UserServiceImpl implements UserService {
         boolean flag=false;
 
         try {
-            int deleteNum=userDao.deleteUserById(delId);
+            int deleteNum= userMapper.deleteUserById(delId);
             if(deleteNum>0)
                 flag=true;
         } catch (Exception e) {

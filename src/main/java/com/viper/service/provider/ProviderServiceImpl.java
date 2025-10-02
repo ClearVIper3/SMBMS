@@ -1,7 +1,7 @@
 package com.viper.service.provider;
 
-import com.viper.dao.bill.BillDao;
-import com.viper.dao.provider.ProviderDao;
+import com.viper.dao.bill.BillMapper;
+import com.viper.dao.provider.ProviderMapper;
 import com.viper.pojo.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +11,13 @@ import java.util.List;
 @Service("providerService")
 public class ProviderServiceImpl implements ProviderService {
 
-    private final ProviderDao providerDao;
-    private final BillDao billDao;
+    private final ProviderMapper providerMapper;
+    private final BillMapper billMapper;
 
     @Autowired
-    public ProviderServiceImpl(ProviderDao providerDao, BillDao billDao) {
-        this.providerDao = providerDao;
-        this.billDao = billDao;
+    public ProviderServiceImpl(ProviderMapper providerMapper, BillMapper billMapper) {
+        this.providerMapper = providerMapper;
+        this.billMapper = billMapper;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ProviderServiceImpl implements ProviderService {
 
         boolean flag = false;
         try{
-            if(providerDao.add(provider) > 0)
+            if(providerMapper.add(provider) > 0)
                 flag = true;
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -39,9 +39,9 @@ public class ProviderServiceImpl implements ProviderService {
         int billCount;
 
         try{
-            billCount = billDao.getBillCountByProviderId(delId);
+            billCount = billMapper.getBillCountByProviderId(delId);
             if(billCount == 0) {
-                providerDao.deleteProviderById(delId);
+                providerMapper.deleteProviderById(delId);
             }
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -55,7 +55,7 @@ public class ProviderServiceImpl implements ProviderService {
 
         Provider provider;
         try{
-            provider = providerDao.getProviderById(id);
+            provider = providerMapper.getProviderById(id);
         }catch (Exception e) {
             e.printStackTrace();
             provider = null;
@@ -67,7 +67,7 @@ public class ProviderServiceImpl implements ProviderService {
     public boolean modify(Provider provider) {
         boolean flag = false;
         try{
-            if(providerDao.modify(provider) > 0)
+            if(providerMapper.modify(provider) > 0)
                 flag = true;
         } catch (Exception e){
             e.printStackTrace();
@@ -82,7 +82,7 @@ public class ProviderServiceImpl implements ProviderService {
         System.out.println("query proName ---- > " + proName);
         System.out.println("query proCode ---- > " + proCode);
         try {
-            providerList = providerDao.getProviderList(proName,proCode);
+            providerList = providerMapper.getProviderList(proName,proCode);
         } catch (Exception e) {
             e.printStackTrace();
         }
