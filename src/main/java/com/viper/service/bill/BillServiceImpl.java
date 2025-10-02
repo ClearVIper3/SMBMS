@@ -4,11 +4,13 @@ import com.viper.dao.bill.BillMapper;
 import com.viper.pojo.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service("billService")
+@Transactional
 public class BillServiceImpl implements BillService{
 
     private final BillMapper billMapper;

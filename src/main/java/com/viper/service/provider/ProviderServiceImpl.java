@@ -5,10 +5,12 @@ import com.viper.dao.provider.ProviderMapper;
 import com.viper.pojo.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service("providerService")
+@Transactional
 public class ProviderServiceImpl implements ProviderService {
 
     private final ProviderMapper providerMapper;
