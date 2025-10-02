@@ -80,6 +80,12 @@
       <version>8.0.33</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.11.2</version>
+    </dependency>
+
     <!-- 工具库 -->
     <dependency>
       <groupId>com.alibaba.fastjson2</groupId>

@@ -2,28 +2,45 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
     https://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/aop
-    https://www.springframework.org/schema/aop/spring-aop.xsd">
+    https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!--DataSource:使用spring的数据源替换Mybatis的配置 c3p0 dbcp druid-->
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/smbms?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
-        <property name="username" value="root"/>
-        <property name="password" value="123456"/>
+    <!-- 1.关联数据库文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- 使用 C3P0 数据源连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <!-- 基本连接配置 -->
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <!-- 连接池配置 -->
+        <property name="initialPoolSize" value="5"/>
+        <property name="minPoolSize" value="5"/>
+        <property name="maxPoolSize" value="20"/>
+        <property name="maxIdleTime" value="1800"/>
+        <property name="acquireIncrement" value="2"/>
+        <property name="maxStatements" value="0"/>
+
+        <!-- 连接测试配置 -->
+        <property name="idleConnectionTestPeriod" value="18000"/>
+        <property name="testConnectionOnCheckout" value="true"/>
+        <property name="preferredTestQuery" value="SELECT 1"/>
     </bean>
 
-    <!--sqlSessionFactory-->
+    <!-- sqlSessionFactory -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:mybatis-config.xml"/>
-        <!--每一个mapper都要在Mybatis核心配置文件中注册-->
         <property name="mapperLocations" value="classpath:com/viper/dao/**/*.xml"/>
     </bean>
 
-    <!--SqlSessionTemplate:sqlSession-->
+    <!-- SqlSessionTemplate: sqlSession -->
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
         <constructor-arg index="0" ref="sqlSessionFactory"/>
     </bean>
