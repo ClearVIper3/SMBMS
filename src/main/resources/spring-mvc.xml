@@ -16,11 +16,14 @@
     <!-- 静态资源处理 -->
     <mvc:default-servlet-handler/>
 
-    <!-- 视图解析器 -->
+    <!-- 视图解析器 - 增强配置 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
         <property name="prefix" value="/jsp/" />
         <property name="suffix" value=".jsp" />
+        <!-- 添加这些属性使重定向和转发更好用 -->
+        <property name="redirectContextRelative" value="false" />
+        <property name="redirectHttp10Compatible" value="false" />
     </bean>
 
 </beans>

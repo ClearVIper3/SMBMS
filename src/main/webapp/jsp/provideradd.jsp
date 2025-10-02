@@ -36,7 +36,7 @@
             </div>
             <div>
                 <label for="proAddress">联系地址：</label>
-                <input type="text" name="proAddress" id="proAddress" value="">
+                <input type="text" name="userAddress" id="proAddress" value="">
             </div>
             <div>
                 <label for="proFax">传真：</label>

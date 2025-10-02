@@ -1,6 +1,5 @@
 package com.viper.controller.bill;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.viper.pojo.Bill;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;
@@ -10,17 +9,14 @@ import com.viper.utils.Constants;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,174 +35,153 @@ public class BillController{
         this.providerService = providerService;
     }
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    public void handleRequest(
-            @RequestParam("method") String method,
-            HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException{
+    @RequestMapping(params = "method=query")
+    public String query(
+            @RequestParam(value = "queryProductName", required = false) String queryProductName,
+            @RequestParam(value = "queryProviderId", required = false) String queryProviderId,
+            @RequestParam(value = "queryIsPayment", required = false) String queryIsPayment,
+            Model model){
 
-        System.out.println("method----> " + method);
-        if(method != null && method.equals("query")){
-            this.query(request,response);
-        }else if(method != null && method.equals("add")){
-            this.add(request,response);
-        }else if(method != null && method.equals("view")){
-            this.getBillById(request,response,"billview.jsp");
-        }else if(method != null && method.equals("modify")){
-            this.getBillById(request,response,"billmodify.jsp");
-        }else if(method != null && method.equals("modifysave")){
-            this.modify(request,response);
-        }else if(method != null && method.equals("delbill")){
-            this.delBill(request,response);
-        }else if(method != null && method.equals("getproviderlist")){
-            this.getProviderlist(request,response);
+        List<Provider> providerList = providerService.getProviderList("", "");
+        model.addAttribute("providerList", providerList);
+
+        if (StringUtils.isNullOrEmpty(queryProductName)) {
+            queryProductName = "";
         }
-    }
-
-    private void getProviderlist(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        System.out.println("getproviderlist ========================= ");
-
-        List<Provider> providerList = new ArrayList<Provider>();
-        providerList = providerService.getProviderList("","");
-
-        //把providerList转换成json对象输出
-        response.setContentType("application/json");
-        PrintWriter outPrintWriter = response.getWriter();
-        outPrintWriter.write(JSONArray.toJSONString(providerList));
-        outPrintWriter.flush();
-        outPrintWriter.close();
-    }
-    private void getBillById(HttpServletRequest request, HttpServletResponse response,String url)
-            throws ServletException, IOException {
-        String id = request.getParameter("billid");
-        if(!StringUtils.isNullOrEmpty(id)){
-            Bill bill = null;
-            bill = billService.getBillById(id);
-            request.setAttribute("bill", bill);
-            request.getRequestDispatcher(url).forward(request, response);
-        }
-    }
-
-    private void modify(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        System.out.println("modify===============");
-        String id = request.getParameter("id");
-        String productName = request.getParameter("productName");
-        String productDesc = request.getParameter("productDesc");
-        String productUnit = request.getParameter("productUnit");
-        String productCount = request.getParameter("productCount");
-        String totalPrice = request.getParameter("totalPrice");
-        String providerId = request.getParameter("providerId");
-        String isPayment = request.getParameter("isPayment");
 
         Bill bill = new Bill();
-        bill.setId(Integer.valueOf(id));
+        if (StringUtils.isNullOrEmpty(queryIsPayment)) {
+            bill.setIsPayment(0);
+        } else {
+            bill.setIsPayment(Integer.parseInt(queryIsPayment));
+        }
+        if (StringUtils.isNullOrEmpty(queryProviderId)) {
+            bill.setProviderId(0);
+        } else {
+            bill.setProviderId(Integer.parseInt(queryProviderId));
+        }
+        bill.setProductName(queryProductName);
+
+        List<Bill> billList = billService.getBillList(bill);
+        model.addAttribute("billList", billList);
+        model.addAttribute("queryProductName", queryProductName);
+        model.addAttribute("queryProviderId", queryProviderId);
+        model.addAttribute("queryIsPayment", queryIsPayment);
+
+        return "billlist";
+    }
+
+    @RequestMapping(params = "method=view")
+    public String getBillById(@RequestParam("billid") String billId, Model model) {
+        if (!StringUtils.isNullOrEmpty(billId)) {
+            Bill bill = billService.getBillById(billId);
+            model.addAttribute("bill", bill);
+        }
+        return "billview";
+    }
+
+    @RequestMapping(params = "method=modify")
+    public String getBillByIdModify(@RequestParam("billid") String billId, Model model) {
+        if (!StringUtils.isNullOrEmpty(billId)) {
+            Bill bill = billService.getBillById(billId);
+            model.addAttribute("bill", bill);
+        }
+        return "billmodify";
+    }
+
+    @RequestMapping(params = "method=modifysave", method = RequestMethod.POST)
+    public String modify(
+            @RequestParam("id") Integer id,
+            @RequestParam("productName") String productName,
+            @RequestParam(value = "productDesc", required = false) String productDesc,
+            @RequestParam("productUnit") String productUnit,
+            @RequestParam("productCount") String productCount,
+            @RequestParam("totalPrice") String totalPrice,
+            @RequestParam("providerId") Integer providerId,
+            @RequestParam("isPayment") Integer isPayment,
+            HttpSession session) {
+
+        System.out.println("modify===============");
+
+        Bill bill = new Bill();
+        bill.setId(id);
         bill.setProductName(productName);
         bill.setProductDesc(productDesc);
         bill.setProductUnit(productUnit);
-        bill.setProductCount(new BigDecimal(productCount).setScale(2,BigDecimal.ROUND_DOWN));
-        bill.setIsPayment(Integer.parseInt(isPayment));
-        bill.setTotalPrice(new BigDecimal(totalPrice).setScale(2,BigDecimal.ROUND_DOWN));
-        bill.setProviderId(Integer.parseInt(providerId));
+        bill.setProductCount(new BigDecimal(productCount).setScale(2, BigDecimal.ROUND_DOWN));
+        bill.setIsPayment(isPayment);
+        bill.setTotalPrice(new BigDecimal(totalPrice).setScale(2, BigDecimal.ROUND_DOWN));
+        bill.setProviderId(providerId);
 
-        bill.setModifyBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
+        User user = (User) session.getAttribute(Constants.USER_SESSION);
+        bill.setModifyBy(user.getId());
         bill.setModifyDate(new Date());
-        boolean flag = false;
-        flag = billService.modify(bill);
-        if(flag){//判断是否修改成功
-            response.sendRedirect(request.getContextPath()+"/jsp/bill.do?method=query");
-        }else{
-            request.getRequestDispatcher("billmodify.jsp").forward(request, response);
+
+        boolean flag = billService.modify(bill);
+        if (flag) {
+            return "redirect:/smbms/jsp/bill.do?method=query";
+        } else {
+            return "billmodify";
         }
     }
-    private void delBill(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String id = request.getParameter("billid");
-        HashMap<String, String> resultMap = new HashMap<String, String>();
-        if(!StringUtils.isNullOrEmpty(id)){
-            boolean flag = billService.deleteBillById(id);
-            if(flag){//删除成功
+
+    @RequestMapping(params = "method=delbill")
+    @ResponseBody
+    public HashMap<String, String> delBill(@RequestParam("billid") String billId) {
+        HashMap<String, String> resultMap = new HashMap<>();
+        if (!StringUtils.isNullOrEmpty(billId)) {
+            boolean flag = billService.deleteBillById(billId);
+            if (flag) {
                 resultMap.put("delResult", "true");
-            }else{//删除失败
+            } else {
                 resultMap.put("delResult", "false");
             }
-        }else{
+        } else {
             resultMap.put("delResult", "notexit");
         }
-        //把resultMap转换成json对象输出
-        response.setContentType("application/json");
-        PrintWriter outPrintWriter = response.getWriter();
-        outPrintWriter.write(JSONArray.toJSONString(resultMap));
-        outPrintWriter.flush();
-        outPrintWriter.close();
+        return resultMap;
     }
-    private void add(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String billCode = request.getParameter("billCode");
-        String productName = request.getParameter("productName");
-        String productDesc = request.getParameter("productDesc");
-        String productUnit = request.getParameter("productUnit");
 
-        String productCount = request.getParameter("productCount");
-        String totalPrice = request.getParameter("totalPrice");
-        String providerId = request.getParameter("providerId");
-        String isPayment = request.getParameter("isPayment");
+    @RequestMapping(params = "method=add", method = RequestMethod.POST)
+    public String add(
+            @RequestParam("billCode") String billCode,
+            @RequestParam("productName") String productName,
+            @RequestParam(value = "productDesc", required = false) String productDesc,
+            @RequestParam("productUnit") String productUnit,
+            @RequestParam("productCount") String productCount,
+            @RequestParam("totalPrice") String totalPrice,
+            @RequestParam("providerId") Integer providerId,
+            @RequestParam("isPayment") Integer isPayment,
+            HttpSession session) {
 
         Bill bill = new Bill();
         bill.setBillCode(billCode);
         bill.setProductName(productName);
         bill.setProductDesc(productDesc);
         bill.setProductUnit(productUnit);
-        bill.setProductCount(new BigDecimal(productCount).setScale(2,BigDecimal.ROUND_DOWN));
-        bill.setIsPayment(Integer.parseInt(isPayment));
-        bill.setTotalPrice(new BigDecimal(totalPrice).setScale(2,BigDecimal.ROUND_DOWN));
-        bill.setProviderId(Integer.parseInt(providerId));
-        bill.setCreatedBy(((User)request.getSession().getAttribute(Constants.USER_SESSION)).getId());
+        bill.setProductCount(new BigDecimal(productCount).setScale(2, BigDecimal.ROUND_DOWN));
+        bill.setIsPayment(isPayment);
+        bill.setTotalPrice(new BigDecimal(totalPrice).setScale(2, BigDecimal.ROUND_DOWN));
+        bill.setProviderId(providerId);
+
+        User user = (User) session.getAttribute(Constants.USER_SESSION);
+        bill.setCreatedBy(user.getId());
         bill.setCreationDate(new Date());
-        boolean flag = false;
-        flag = billService.add(bill);
+
+        boolean flag = billService.add(bill);
         System.out.println("add flag -- > " + flag);
-        if(flag){//判断是否修改成功
-            response.sendRedirect(request.getContextPath()+"/jsp/bill.do?method=query");
-        }else{
-            request.getRequestDispatcher("billadd.jsp").forward(request, response);
+
+        if (flag) {
+            return "redirect:/smbms/jsp/bill.do?method=query";
+        } else {
+            return "billadd";
         }
     }
-    private void query(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
 
-        List<Provider> providerList = new ArrayList<Provider>();
-        providerList = providerService.getProviderList("","");
-        request.setAttribute("providerList", providerList);
-
-        String queryProductName = request.getParameter("queryProductName");
-        String queryProviderId = request.getParameter("queryProviderId");
-        String queryIsPayment = request.getParameter("queryIsPayment");
-        if(StringUtils.isNullOrEmpty(queryProductName)){
-            queryProductName = "";
-        }
-
-        List<Bill> billList = new ArrayList<Bill>();
-        Bill bill = new Bill();
-        if(StringUtils.isNullOrEmpty(queryIsPayment)){
-            bill.setIsPayment(0);
-        }else{
-            bill.setIsPayment(Integer.parseInt(queryIsPayment));
-        }
-        if(StringUtils.isNullOrEmpty(queryProviderId)){
-            bill.setProviderId(0);
-        }else{
-            bill.setProviderId(Integer.parseInt(queryProviderId));
-        }
-        bill.setProductName(queryProductName);
-        billList = billService.getBillList(bill);
-        request.setAttribute("billList", billList);
-        request.setAttribute("queryProductName", queryProductName);
-        request.setAttribute("queryProviderId", queryProviderId);
-        request.setAttribute("queryIsPayment", queryIsPayment);
-        request.getRequestDispatcher("billlist.jsp").forward(request, response);
-
+    @RequestMapping(params = "method=getproviderlist")
+    @ResponseBody
+    public List<Provider> getProviderlist() {
+        System.out.println("getproviderlist ========================= ");
+        return providerService.getProviderList("", "");
     }
 }

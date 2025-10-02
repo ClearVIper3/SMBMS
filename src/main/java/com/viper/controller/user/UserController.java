@@ -1,6 +1,5 @@
 package com.viper.controller.user;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
 import com.viper.pojo.Role;
 import com.viper.pojo.User;
@@ -10,15 +9,13 @@ import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,220 +35,158 @@ public class UserController{
         this.userService = userService;
     }
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST})
-    public void handleRequest(
-            @RequestParam("method") String method,
-            HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException{
+    @RequestMapping(params = "method=savepwd")
+    public String updateUser(
+            @RequestParam("newpassword") String newPassword,
+            HttpSession session,
+            Model model) {
 
-        if (method != null && method.equals("savepwd")) {
-            this.updateUser(request, response);
-        } else if (method != null && method.equals("pwdmodify")) {
-            this.pwdModify(request, response);
-        } else if (method != null && method.equals("query")) {
-            this.query(request, response);
-        } else if(method != null && method.equals("ucexist")) {
-            this.userCodeExist(request, response);
-        } else if(method != null && method.equals("getrolelist")) {
-            this.getRoleList(request, response);
-        } else if(method != null && method.equals("add")) {
-            this.add(request, response);
-        } else if(method != null && method.equals("deluser")){
-            this.delUser(request, response);
-        } else if(method != null && method.equals("modify")){
-            //通过用户id得到用户
-            this.getUserById(request, response,"usermodify.jsp");
-        } else if(method != null && method.equals("modifyexe")){
-            this.modify(request, response);
-        } else if(method != null && method.equals("view")){
-            this.getUserById(request, response,"userview.jsp");
-        }
-    }
-
-    private void updateUser(HttpServletRequest req, HttpServletResponse resp){
-        Object attribute = req.getSession().getAttribute(Constants.USER_SESSION);
-
-        //System.out.println("来了来了label");
-
-        String password = req.getParameter("newpassword");
-
+        Object attribute = session.getAttribute(Constants.USER_SESSION);
         Boolean flag;
 
-        //System.out.println(attribute != null);
-        //System.out.println(!StringUtils.isNullOrEmpty(password));
+        if (attribute != null && !StringUtils.isNullOrEmpty(newPassword)) {
+            flag = userService.PasswordModify(((User) attribute).getId(), newPassword);
 
-        if(attribute != null && !StringUtils.isNullOrEmpty(password)) {
-            flag = userService.PasswordModify(((User)attribute).getId(), password);
-
-            if(flag) {
-                req.setAttribute("message","修改密码成功，请退出，使用新密码登录");
-                req.getSession().removeAttribute(Constants.USER_SESSION);
-                //移除Session -> filter
-            } else{
-                req.setAttribute("message","修改密码失败");
+            if (flag) {
+                model.addAttribute("message", "修改密码成功，请退出，使用新密码登录");
+                session.removeAttribute(Constants.USER_SESSION);
+            } else {
+                model.addAttribute("message", "修改密码失败");
             }
         } else {
-            req.setAttribute("message","新密码有问题");
+            model.addAttribute("message", "新密码有问题");
         }
 
-        try {
-            req.getRequestDispatcher("pwdmodify.jsp").forward(req, resp);
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return "pwdmodify";
     }
 
-    private void pwdModify(HttpServletRequest req, HttpServletResponse resp){
+    @RequestMapping(params = "method=pwdmodify")
+    @ResponseBody
+    public HashMap<String, String> pwdModify(
+            @RequestParam("oldpassword") String oldPassword,
+            HttpSession session) {
 
-        Object o = req.getSession().getAttribute(Constants.USER_SESSION);
-        String oldPassword = req.getParameter("oldpassword");
+        Object o = session.getAttribute(Constants.USER_SESSION);
+        HashMap<String, String> resultMap = new HashMap<>();
 
-        HashMap<String,String> resultMap = new HashMap<>();
-
-        if(o == null){
-            resultMap.put("result","sessionerror");
-        }else if(StringUtils.isNullOrEmpty(oldPassword)) {
-            resultMap.put("result","error");
-        }else{
-            String userPassword = ((User)o).getUserPassword();
-            if(userPassword.equals(oldPassword)) {
-                resultMap.put("result","true");
-            }else{
-                resultMap.put("result","false");
+        if (o == null) {
+            resultMap.put("result", "sessionerror");
+        } else if (StringUtils.isNullOrEmpty(oldPassword)) {
+            resultMap.put("result", "error");
+        } else {
+            String userPassword = ((User) o).getUserPassword();
+            if (userPassword.equals(oldPassword)) {
+                resultMap.put("result", "true");
+            } else {
+                resultMap.put("result", "false");
             }
         }
 
-        try{
-            resp.setContentType("application/json");
-            PrintWriter writer = resp.getWriter();
-            /*
-                resultMap = ["result", "sessionerror"]
-                Json格式 = {key : value}
-             */
-            writer.write(JSONArray.toJSONString(resultMap));
-            writer.flush();
-            writer.close();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+        return resultMap;
     }
 
-    private void query(HttpServletRequest req, HttpServletResponse resp){
+    @RequestMapping(params = "method=query")
+    public String query(
+            @RequestParam(value = "queryname", required = false) String queryUserName,
+            @RequestParam(value = "queryUserRole", required = false) String temp,
+            @RequestParam(value = "pageIndex", required = false) String pageIndex,
+            Model model) {
 
-        //查询用户列表
-
-        //从前端获取数据
-        String queryUserName = req.getParameter("queryname"); //查询人名
-        String temp = req.getParameter("queryUserRole");  //查询职位
-        String pageIndex = req.getParameter("pageIndex"); //当前页数
-        int queryUserRole = 0;
-
-        //获取用户列表
-
-        //第一次走这个请求，一定是第一页，页面大小固定
-        int pageSize = 5; //可优化为CONSTANT
-        int currentPageNo = 1;
-
-        if(queryUserName == null){
+        // 处理参数
+        if (queryUserName == null) {
             queryUserName = "";
         }
-        if(temp != null && !temp.equals("")){
-            queryUserRole = Integer.parseInt(temp); //给查询赋值0，1，2，3
+
+        int queryUserRole = 0;
+        if (temp != null && !temp.equals("")) {
+            queryUserRole = Integer.parseInt(temp);
         }
-        if(pageIndex != null){
+
+        int pageSize = 5;
+        int currentPageNo = 1;
+        if (pageIndex != null) {
             currentPageNo = Integer.parseInt(pageIndex);
         }
 
-        //获取用户的总数（分页：上一页，下一页的情况）
+        // 获取用户总数
         int totalCount = userService.getUserCount(queryUserName, queryUserRole);
-        //总页数支持
+
+        // 分页支持
         PageSupport pageSupport = new PageSupport();
         pageSupport.setPageSize(pageSize);
         pageSupport.setCurrentPageNo(currentPageNo);
         pageSupport.setTotalCount(totalCount);
 
-        //控制首页和尾页行为
         int totalPageCount = pageSupport.getTotalPageCount();
 
-        if(currentPageNo < 1){
+        // 控制首页和尾页行为
+        if (currentPageNo < 1) {
             currentPageNo = 1;
-        } else if(currentPageNo > totalPageCount){
+        } else if (currentPageNo > totalPageCount) {
             currentPageNo = totalPageCount;
         }
 
-        //用户列表展示
+        // 用户列表展示
         List<User> userList = userService.getUserList(queryUserName, queryUserRole, currentPageNo, pageSize);
-        req.setAttribute("userList", userList);
-
         List<Role> roleList = roleService.getRoleList();
-        req.setAttribute("roleList", roleList);
-        req.setAttribute("currentPageNo", currentPageNo);
-        req.setAttribute("totalCount", totalCount);
-        req.setAttribute("totalPageCount", totalPageCount);
-        req.setAttribute("queryUserName", queryUserName);
-        req.setAttribute("queryUserRole", queryUserRole);
 
-        try{
-            req.getRequestDispatcher("userlist.jsp").forward(req, resp);
-        } catch(Exception e){
-            e.printStackTrace();
-        }
+        model.addAttribute("userList", userList);
+        model.addAttribute("roleList", roleList);
+        model.addAttribute("currentPageNo", currentPageNo);
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("totalPageCount", totalPageCount);
+        model.addAttribute("queryUserName", queryUserName);
+        model.addAttribute("queryUserRole", queryUserRole);
+
+        return "userlist";
     }
 
-    private void getRoleList(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
-        List<Role> roleList = null;
-        roleList = roleService.getRoleList();
-        //把roleList转换成json对象输出
-        resp.setContentType("application/json");
-        PrintWriter outPrintWriter = resp.getWriter();
-        outPrintWriter.write(JSONArray.toJSONString(roleList));
-        outPrintWriter.flush();
-        outPrintWriter.close();
+    @RequestMapping(params = "method=getrolelist")
+    @ResponseBody
+    public List<Role> getRoleList() {
+        return roleService.getRoleList();
     }
 
-    private void userCodeExist(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
-        //先拿到用户的编码
-        String userCode = req.getParameter("userCode");
-        //用一个hashmap，暂存现在所有现存的用户编码
-        HashMap<String, String> resultMap = new HashMap<String, String>();
-        if(StringUtils.isNullOrEmpty(userCode)){
-            //userCode == null || userCode.equals("")
-            //如果输入的这个编码为空或者不存在，说明可用
+    @RequestMapping(params = "method=ucexist")
+    @ResponseBody
+    public HashMap<String, String> userCodeExist(@RequestParam("userCode") String userCode) {
+        HashMap<String, String> resultMap = new HashMap<>();
+
+        if (StringUtils.isNullOrEmpty(userCode)) {
             resultMap.put("userCode", "exist");
-        }else{//如果输入的编码不为空，则需要去找一下是否存在这个用户
+        } else {
             User user = userService.selectUserCodeExist(userCode);
-            if(null != user){
-                resultMap.put("userCode","exist");
-            }else{
+            if (null != user) {
+                resultMap.put("userCode", "exist");
+            } else {
                 resultMap.put("userCode", "notexist");
             }
         }
-        //把resultMap转为json字符串以json的形式输出
-        //配置上下文的输出类型
-        resp.setContentType("application/json");
-        //从response对象中获取往外输出的writer对象
-        PrintWriter outPrintWriter = resp.getWriter();
-        //把resultMap转为json字符串 输出
-        outPrintWriter.write(JSONArray.toJSONString(resultMap));
-        outPrintWriter.flush();//刷新
-        outPrintWriter.close();//关闭流
+
+        return resultMap;
     }
 
-    private void add(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
+    @RequestMapping(params = "method=add", method = RequestMethod.GET)
+    public String addPage() {
+        return "useradd";
+    }
+
+    // 提交添加用户
+    @RequestMapping(params = "method=add", method = RequestMethod.POST)
+    public String add(
+            @RequestParam("userCode") String userCode,
+            @RequestParam("userName") String userName,
+            @RequestParam("userPassword") String userPassword,
+            @RequestParam("gender") String gender,
+            @RequestParam("birthday") String birthday,
+            @RequestParam("phone") String phone,
+            @RequestParam("address") String address,
+            @RequestParam("userRole") String userRole,
+            HttpSession session,
+            Model model) {
+
         System.out.println("当前正在执行增加用户操作");
-        //从前端得到页面的请求的参数即用户输入的值
-        String userCode = req.getParameter("userCode");
-        String userName = req.getParameter("userName");
-        String userPassword = req.getParameter("userPassword");
-        //String ruserPassword = req.getParameter("ruserPassword");
-        String gender = req.getParameter("gender");
-        String birthday = req.getParameter("birthday");
-        String phone = req.getParameter("phone");
-        String address = req.getParameter("address");
-        String userRole = req.getParameter("userRole");
-        //把这些值塞进一个用户属性中
+
         User user = new User();
         user.setUserCode(userCode);
         user.setUserName(userName);
@@ -259,101 +194,111 @@ public class UserController{
         user.setAddress(address);
         user.setGender(Integer.valueOf(gender));
         user.setPhone(phone);
+
         try {
             user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(birthday));
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         user.setUserRole(Integer.valueOf(userRole));
         user.setCreationDate(new Date());
-        //查找当前正在登陆的用户的id
-        user.setCreatedBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+
+        User currentUser = (User) session.getAttribute(Constants.USER_SESSION);
+        user.setCreatedBy(currentUser.getId());
+
         Boolean flag = userService.add(user);
-        //如果添加成功，则页面转发，否则重新刷新，再次跳转到当前页面
-        if(flag){
-            resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
-        }else{
-            req.getRequestDispatcher("useradd.jsp").forward(req,resp);
+
+        if (flag) {
+            return "redirect:http://localhost:8080/smbms/jsp/user.do?method=query";
+        } else {
+            model.addAttribute("error", "添加用户失败");
+            return "useradd";
         }
     }
 
-    private void delUser(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
-        String id = req.getParameter("uid");
+    @RequestMapping(params = "method=deluser")
+    @ResponseBody
+    public HashMap<String, String> delUser(@RequestParam("uid") String id) {
+        HashMap<String, String> resultMap = new HashMap<>();
         Integer delId = 0;
-        try{
+
+        try {
             delId = Integer.parseInt(id);
-        }catch (Exception e) {
-            // TODO: handle exception
+        } catch (Exception e) {
             delId = 0;
         }
-        //需要判断是否能删除成功
-        HashMap<String, String> resultMap = new HashMap<String, String>();
-        if(delId <= 0){
+
+        if (delId <= 0) {
             resultMap.put("delResult", "notexist");
-        }else{
-            if(userService.deleteUserById(delId)){
+        } else {
+            if (userService.deleteUserById(delId)) {
                 resultMap.put("delResult", "true");
-            }else{
+            } else {
                 resultMap.put("delResult", "false");
             }
         }
 
-        //把resultMap转换成json对象输出
-        resp.setContentType("application/json");
-        PrintWriter outPrintWriter = resp.getWriter();
-        outPrintWriter.write(JSONArray.toJSONString(resultMap));
-        outPrintWriter.flush();
-        outPrintWriter.close();
+        return resultMap;
     }
 
-    private void getUserById(HttpServletRequest req, HttpServletResponse resp,String url) throws ServletException, IOException{
-        String id = req.getParameter("uid");
-        if(!StringUtils.isNullOrEmpty(id)){
-            //调用后台方法得到user对象
-            User user = userService.getUserById(id);
-            req.setAttribute("user", user);
-            req.getRequestDispatcher(url).forward(req, resp);
+    @RequestMapping(params = "method=modify")
+    public String getUserByIdModify(@RequestParam("uid") String userId, Model model) {
+        if (!StringUtils.isNullOrEmpty(userId)) {
+            User user = userService.getUserById(userId);
+            model.addAttribute("user", user);
         }
+        return "usermodify";
     }
 
+    @RequestMapping(params = "method=view")
+    public String getUserByIdView(@RequestParam("uid") String userId, Model model) {
+        if (!StringUtils.isNullOrEmpty(userId)) {
+            User user = userService.getUserById(userId);
+            model.addAttribute("user", user);
+        }
+        return "userview";
+    }
 
-    //修改用户信息
-    private void modify(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException{
-        //需要拿到前端传递进来的参数
-        String id = req.getParameter("uid");;
-        String userName = req.getParameter("userName");
-        String gender = req.getParameter("gender");
-        String birthday = req.getParameter("birthday");
-        String phone = req.getParameter("phone");
-        String address = req.getParameter("address");
-        String userRole = req.getParameter("userRole");
+    @RequestMapping(params = "method=modifyexe", method = RequestMethod.POST)
+    public String modify(
+            @RequestParam("uid") String id,
+            @RequestParam("userName") String userName,
+            @RequestParam("gender") String gender,
+            @RequestParam("birthday") String birthday,
+            @RequestParam("phone") String phone,
+            @RequestParam("address") String address,
+            @RequestParam("userRole") String userRole,
+            HttpSession session,
+            Model model) {
 
-        //创建一个user对象接收这些参数
         User user = new User();
         user.setId(Integer.valueOf(id));
         user.setUserName(userName);
         user.setGender(Integer.valueOf(gender));
+
         try {
             user.setBirthday(new SimpleDateFormat("yyyy-MM-dd").parse(birthday));
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
         user.setPhone(phone);
         user.setAddress(address);
         user.setUserRole(Integer.valueOf(userRole));
-        user.setModifyBy(((User)req.getSession().getAttribute(Constants.USER_SESSION)).getId());
+
+        User currentUser = (User) session.getAttribute(Constants.USER_SESSION);
+        user.setModifyBy(currentUser.getId());
         user.setModifyDate(new Date());
 
-        //调用service层
         Boolean flag = userService.modify(user);
 
-        //判断是否修改成功来决定跳转到哪个页面
-        if(flag){
-            resp.sendRedirect(req.getContextPath()+"/jsp/user.do?method=query");
-        }else{
-            req.getRequestDispatcher("usermodify.jsp").forward(req, resp);
+        if (flag) {
+            return "redirect:http://localhost:8080/smbms/jsp/user.do?method=query";
+        } else {
+            model.addAttribute("error", "修改用户失败");
+            return "usermodify";
         }
-
     }
+
 }
