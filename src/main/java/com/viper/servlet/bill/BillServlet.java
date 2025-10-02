@@ -1,6 +1,6 @@
 package com.viper.servlet.bill;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSONArray;
 import com.viper.pojo.Bill;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;

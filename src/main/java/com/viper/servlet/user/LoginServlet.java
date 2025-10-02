@@ -1,9 +1,7 @@
 package com.viper.servlet.user;
 
 import com.viper.pojo.User;
-import com.viper.service.role.RoleServiceImpl;
 import com.viper.service.user.UserService;
-import com.viper.service.user.UserServiceImpl;
 import com.viper.utils.Constants;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
