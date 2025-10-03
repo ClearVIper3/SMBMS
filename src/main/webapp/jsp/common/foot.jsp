@@ -2,7 +2,7 @@
          pageEncoding="UTF-8"%>
 
 <footer class="footer">
-  © 2019 版权所有 版权归超市所有
+  © 2025 版权所有 版权归Viper所有
 </footer>
 
 <%-- <script type="text/javascript" src="${pageContext.request.contextPath }/js/time.js"></script> --%>
