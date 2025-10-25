@@ -35,4 +35,12 @@ build/
 .vscode/
 
 ### Mac OS ###
-.DS_Store
+.DS_Store# IDE
+.idea/
+*.iml
+
+# Build outputs
+out/
+
+# SVN
+.svn/
