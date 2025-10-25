@@ -44,3 +44,20 @@ out/
 
 # SVN
 .svn/
+
+# IDE
+.idea/
+*.iml
+
+# Build outputs
+target/
+out/
+
+# System files
+
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
