@@ -2,7 +2,6 @@ package com.viper.service.bill;
 
 import com.viper.dao.bill.BillMapper;
 import com.viper.pojo.Bill;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +12,9 @@ import java.util.List;
 @Transactional
 public class BillServiceImpl implements BillService{
 
+    //业务层都会调用dao层，所以我们要引入Dao层；
     private final BillMapper billMapper;
 
-    //业务层都会调用dao层，所以我们要引入Dao层；
-    @Autowired
     public BillServiceImpl(BillMapper billMapper) {
         this.billMapper = billMapper;
     }

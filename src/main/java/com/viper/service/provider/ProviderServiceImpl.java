@@ -3,7 +3,6 @@ package com.viper.service.provider;
 import com.viper.dao.bill.BillMapper;
 import com.viper.dao.provider.ProviderMapper;
 import com.viper.pojo.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ public class ProviderServiceImpl implements ProviderService {
     private final ProviderMapper providerMapper;
     private final BillMapper billMapper;
 
-    @Autowired
     public ProviderServiceImpl(ProviderMapper providerMapper, BillMapper billMapper) {
         this.providerMapper = providerMapper;
         this.billMapper = billMapper;

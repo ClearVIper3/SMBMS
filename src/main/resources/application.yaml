@@ -1,0 +1,54 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /smbms
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+    session:
+      timeout: 30m
+
+spring:
+  mvc:
+    view:
+      prefix: /jsp/
+      suffix: .jsp
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: file:src/main/webapp/
+  devtools:
+    restart:
+      enabled: true
+
+  thymeleaf:
+    enabled: false
+
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/smbms?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 1800000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-aliases-package: com.viper.pojo
+  mapper-locations: classpath:com/viper/dao/**/*.xml
+
+logging:
+  level:
+    com:
+      viper: DEBUG
+    org:
+      springframework: INFO

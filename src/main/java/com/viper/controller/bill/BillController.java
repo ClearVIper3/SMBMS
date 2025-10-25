@@ -7,7 +7,6 @@ import com.viper.service.bill.BillService;
 import com.viper.service.provider.ProviderService;
 import com.viper.utils.Constants;
 import com.mysql.cj.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,6 @@ public class BillController{
     private final ProviderService providerService;
 
     // 构造器注入
-    @Autowired
     public BillController(BillService billService, ProviderService providerService) {
         this.billService = billService;
         this.providerService = providerService;
@@ -119,7 +117,7 @@ public class BillController{
 
         boolean flag = billService.modify(bill);
         if (flag) {
-            return "redirect:/smbms/jsp/bill.do?method=query";
+            return "redirect:/jsp/bill.do?method=query";
         } else {
             return "billmodify";
         }
@@ -172,7 +170,7 @@ public class BillController{
         System.out.println("add flag -- > " + flag);
 
         if (flag) {
-            return "redirect:/smbms/jsp/bill.do?method=query";
+            return "redirect:/jsp/bill.do?method=query";
         } else {
             return "billadd";
         }

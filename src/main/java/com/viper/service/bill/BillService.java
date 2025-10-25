@@ -1,6 +1,7 @@
 package com.viper.service.bill;
 
 import com.viper.pojo.Bill;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 

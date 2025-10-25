@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: 30886
+Build-Jdk: Oracle OpenJDK 23.0.2
+Implementation-Title: SMBMS Spring Boot
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: org.example
+Main-Class: ${start-class}
+

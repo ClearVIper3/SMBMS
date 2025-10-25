@@ -5,7 +5,6 @@ import com.viper.pojo.Provider;
 import com.viper.pojo.User;
 import com.viper.service.provider.ProviderService;
 import com.viper.utils.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +23,6 @@ public class ProviderController{
 
     private final ProviderService providerService;
 
-    @Autowired
     public ProviderController(ProviderService providerService) {
         this.providerService = providerService;
     }

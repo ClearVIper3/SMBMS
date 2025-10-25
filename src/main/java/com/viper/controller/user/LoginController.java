@@ -3,7 +3,6 @@ package com.viper.controller.user;
 import com.viper.pojo.User;
 import com.viper.service.user.UserService;
 import com.viper.utils.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +17,6 @@ public class LoginController{
 
     private final UserService userService;
 
-    @Autowired
     public LoginController(UserService userService) {
         this.userService = userService;
     }

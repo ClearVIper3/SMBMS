@@ -7,7 +7,6 @@ import com.viper.service.role.RoleService;
 import com.viper.service.user.UserService;
 import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,6 @@ public class UserController{
     private final RoleService roleService;
     private final UserService userService;
 
-    @Autowired
     public UserController(RoleService roleService, UserService userService) {
         this.roleService = roleService;
         this.userService = userService;

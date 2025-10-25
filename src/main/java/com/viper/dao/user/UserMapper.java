@@ -1,11 +1,13 @@
 package com.viper.dao.user;
 
 import com.viper.pojo.User;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Mapper
 public interface UserMapper {
     //得到登录的用户
     //String userPassword

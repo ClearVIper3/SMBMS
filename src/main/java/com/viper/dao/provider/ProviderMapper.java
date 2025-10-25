@@ -1,10 +1,12 @@
 package com.viper.dao.provider;
 
 import com.viper.pojo.Provider;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface ProviderMapper {
     /**
      * 增加供应商
