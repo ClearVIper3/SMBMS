@@ -7,8 +7,9 @@ import com.viper.service.provider.ProviderService;
 import com.viper.utils.Constants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequestMapping("/jsp/provider.do")
+@RequestMapping("/provider")
 public class ProviderController{
 
     private final ProviderService providerService;
@@ -27,7 +28,7 @@ public class ProviderController{
         this.providerService = providerService;
     }
 
-    @RequestMapping(params = "method=query")
+    @GetMapping("/list")
     public String query(
             @RequestParam(value = "queryProName", required = false) String queryProName,
             @RequestParam(value = "queryProCode", required = false) String queryProCode,
@@ -46,10 +47,10 @@ public class ProviderController{
         model.addAttribute("queryProName", queryProName);
         model.addAttribute("queryProCode", queryProCode);
 
-        return "providerlist";
+        return "provider/list";
     }
 
-    @RequestMapping(params = "method=delprovider")
+    @GetMapping("/delete")
     @ResponseBody
     public HashMap<String, String> delProvider(@RequestParam("proid") String proId) {
         HashMap<String, String> resultMap = new HashMap<>();
@@ -68,12 +69,12 @@ public class ProviderController{
         return resultMap;
     }
 
-    @RequestMapping(params = "method=add", method = RequestMethod.GET)
+    @GetMapping("/add")
     public String addPage() {
-        return "provideradd";
+        return "provider/add";
     }
 
-    @RequestMapping(params = "method=add", method = RequestMethod.POST)
+    @PostMapping("/add")
     public String add(
             @RequestParam("proCode") String proCode,
             @RequestParam("proName") String proName,
@@ -99,31 +100,31 @@ public class ProviderController{
 
         boolean flag = providerService.add(provider);
         if (flag) {
-            return "redirect:http://localhost:8080/smbms/jsp/provider.do?method=query";
+            return "redirect:/provider/list";
         } else {
-            return "provideradd";
+            return "provider/add";
         }
     }
 
-    @RequestMapping(params = "method=view")
+    @GetMapping("/view")
     public String getProviderById(@RequestParam("proid") String proId, Model model) {
         if (!StringUtils.isNullOrEmpty(proId)) {
             Provider provider = providerService.getProviderById(proId);
             model.addAttribute("provider", provider);
         }
-        return "providerview";
+        return "provider/view";
     }
 
-    @RequestMapping(params = "method=modify")
+    @GetMapping("/modify")
     public String getProviderByIdModify(@RequestParam("proid") String proId, Model model) {
         if (!StringUtils.isNullOrEmpty(proId)) {
             Provider provider = providerService.getProviderById(proId);
             model.addAttribute("provider", provider);
         }
-        return "providermodify";
+        return "provider/modify";
     }
 
-    @RequestMapping(params = "method=modifysave", method = RequestMethod.POST)
+    @PostMapping("/modify")
     public String modify(
             @RequestParam("id") Integer id,
             @RequestParam("proName") String proName,
@@ -149,9 +150,9 @@ public class ProviderController{
 
         boolean flag = providerService.modify(provider);
         if (flag) {
-            return "redirect:/jsp/provider.do?method=query";
+            return "redirect:/provider/list";
         } else {
-            return "providermodify";
+            return "provider/modify";
         }
     }
 }

@@ -29,7 +29,7 @@ public class SysFilter implements Filter {
         if(user != null){
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
-            response.sendRedirect("/smbms/error.jsp");
+            response.sendRedirect("/smbms/login");
         }
     }
 }

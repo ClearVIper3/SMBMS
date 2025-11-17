@@ -17,6 +17,6 @@ public class LogoutController{
         session.removeAttribute(Constants.USER_SESSION);
 
         // 重定向到登录页面
-        return "redirect:http://localhost:8080/smbms/login.jsp";
+        return "redirect:/login";
     }
 }

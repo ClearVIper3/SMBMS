@@ -37,7 +37,7 @@ public class LoginController{
             // 查有此人，将此人信息存入Session
             session.setAttribute(Constants.USER_SESSION, user);
             // 重定向到主页
-            return "redirect:http://localhost:8080/smbms/jsp/frame.jsp";
+            return "redirect:/frame";
         } else {
             // 查无此人，无法登录
             // 返回登录页面，附带error提示信息

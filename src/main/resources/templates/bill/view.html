@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/head :: head}">
+</head>
+<body>
+<div th:replace="~{common/head :: body}"></div>
+<div class="right">
+    <div class="location">
+        <strong>你现在所在的位置是:</strong>
+        <span>订单管理页面 >> 信息查看</span>
+    </div>
+    <div class="providerView">
+        <p><strong>订单编号：</strong><span th:text="${bill.billCode}"></span></p>
+        <p><strong>商品名称：</strong><span th:text="${bill.productName}"></span></p>
+        <p><strong>商品单位：</strong><span th:text="${bill.productUnit}"></span></p>
+        <p><strong>商品数量：</strong><span th:text="${bill.productCount}"></span></p>
+        <p><strong>总金额：</strong><span th:text="${bill.totalPrice}"></span></p>
+        <p><strong>供应商：</strong><span th:text="${bill.providerName}"></span></p>
+        <p><strong>是否付款：</strong>
+            <span>
+                <span th:if="${bill.isPayment == 1}">未付款</span>
+                <span th:if="${bill.isPayment == 2}">已付款</span>
+            </span>
+        </p>
+        <div class="providerAddBtn">
+            <input type="button" id="back" name="back" value="返回">
+        </div>
+    </div>
+</div>
+</section>
+<div th:replace="~{common/foot :: body}"></div>
+<script type="text/javascript" th:src="@{/js/billview.js}"></script>
+</body>
+</html>
+
