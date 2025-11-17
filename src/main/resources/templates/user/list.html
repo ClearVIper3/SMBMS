@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common/head :: head}">
+</head>
+<body>
+<div th:replace="~{common/head :: body}"></div>
+<div class="right">
+    <div class="location">
+        <strong>你现在所在的位置是:</strong>
+        <span>用户管理页面</span>
+    </div>
+    <div class="search">
+        <form method="get" th:action="@{/user/list}">
+            <span>用户名：</span>
+            <input name="queryname" class="input-text" type="text" th:value="${queryUserName}">
+
+            <span>用户角色：</span>
+            <select name="queryUserRole">
+                <option value="0">--请选择--</option>
+                <option th:each="role : ${roleList}" 
+                        th:value="${role.id}" 
+                        th:text="${role.roleName}"
+                        th:selected="${role.id == queryUserRole}"></option>
+            </select>
+
+            <input type="hidden" name="pageIndex" value="1"/>
+            <input value="查 询" type="submit" id="searchbutton">
+            <a th:href="@{/user/add}">添加用户</a>
+        </form>
+    </div>
+    <!--用户-->
+    <table class="providerTable" cellpadding="0" cellspacing="0">
+        <tr class="firstTr">
+            <th width="10%">用户编码</th>
+            <th width="20%">用户名称</th>
+            <th width="10%">性别</th>
+            <th width="10%">年龄</th>
+            <th width="10%">电话</th>
+            <th width="10%">用户角色</th>
+            <th width="30%">操作</th>
+        </tr>
+        <tr th:each="user : ${userList}">
+            <td>
+                <span th:text="${user.userCode}"></span>
+            </td>
+            <td>
+                <span th:text="${user.userName}"></span>
+            </td>
+            <td>
+                <span>
+                    <span th:if="${user.gender==1}">男</span>
+                    <span th:if="${user.gender==2}">女</span>
+                </span>
+            </td>
+            <td>
+                <span th:text="${user.age}"></span>
+            </td>
+            <td>
+                <span th:text="${user.phone}"></span>
+            </td>
+            <td>
+                <span th:text="${user.userRoleName}"></span>
+            </td>
+            <td>
+                <span><a class="viewUser" href="javascript:;" th:attr="userid=${user.id}, username=${user.userName}"><img th:src="@{/images/read.png}" alt="查看" title="查看"/></a></span>
+                <span><a class="modifyUser" href="javascript:;" th:attr="userid=${user.id}, username=${user.userName}"><img th:src="@{/images/xiugai.png}" alt="修改" title="修改"/></a></span>
+                <span><a class="deleteUser" href="javascript:;" th:attr="userid=${user.id}, username=${user.userName}"><img th:src="@{/images/schu.png}" alt="删除" title="删除"/></a></span>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" id="totalPageCount" th:value="${totalPageCount}"/>
+    <div th:replace="~{common/rollpage :: rollpage(totalCount=${totalCount}, currentPageNo=${currentPageNo}, totalPageCount=${totalPageCount})}"></div>
+</div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<div class="remove" id="removeUse">
+    <div class="removerChid">
+        <h2>提示</h2>
+        <div class="removeMain">
+            <p>你确定要删除该用户吗？</p>
+            <a href="#" id="yes">确定</a>
+            <a href="#" id="no">取消</a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{common/foot :: body}"></div>
+<script type="text/javascript" th:src="@{/js/userlist.js}"></script>
+</body>
+</html>
+

@@ -9,8 +9,9 @@ import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequestMapping("/jsp/user.do")
+@RequestMapping("/user")
 public class UserController{
 
     private final RoleService roleService;
@@ -33,9 +34,10 @@ public class UserController{
         this.userService = userService;
     }
 
-    @RequestMapping(params = "method=savepwd")
+    @PostMapping("/pwdmodify")
     public String updateUser(
             @RequestParam("newpassword") String newPassword,
+            @RequestParam(value = "oldpassword", required = false) String oldPassword,
             HttpSession session,
             Model model) {
 
@@ -55,10 +57,10 @@ public class UserController{
             model.addAttribute("message", "新密码有问题");
         }
 
-        return "pwdmodify";
+        return "user/pwdmodify";
     }
 
-    @RequestMapping(params = "method=pwdmodify")
+    @PostMapping("/pwdmodify/check")
     @ResponseBody
     public HashMap<String, String> pwdModify(
             @RequestParam("oldpassword") String oldPassword,
@@ -83,7 +85,7 @@ public class UserController{
         return resultMap;
     }
 
-    @RequestMapping(params = "method=query")
+    @GetMapping("/list")
     public String query(
             @RequestParam(value = "queryname", required = false) String queryUserName,
             @RequestParam(value = "queryUserRole", required = false) String temp,
@@ -136,16 +138,16 @@ public class UserController{
         model.addAttribute("queryUserName", queryUserName);
         model.addAttribute("queryUserRole", queryUserRole);
 
-        return "userlist";
+        return "user/list";
     }
 
-    @RequestMapping(params = "method=getrolelist")
+    @GetMapping("/getrolelist")
     @ResponseBody
     public List<Role> getRoleList() {
         return roleService.getRoleList();
     }
 
-    @RequestMapping(params = "method=ucexist")
+    @GetMapping("/ucexist")
     @ResponseBody
     public HashMap<String, String> userCodeExist(@RequestParam("userCode") String userCode) {
         HashMap<String, String> resultMap = new HashMap<>();
@@ -164,13 +166,13 @@ public class UserController{
         return resultMap;
     }
 
-    @RequestMapping(params = "method=add", method = RequestMethod.GET)
+    @GetMapping("/add")
     public String addPage() {
-        return "useradd";
+        return "user/add";
     }
 
     // 提交添加用户
-    @RequestMapping(params = "method=add", method = RequestMethod.POST)
+    @PostMapping("/add")
     public String add(
             @RequestParam("userCode") String userCode,
             @RequestParam("userName") String userName,
@@ -208,14 +210,14 @@ public class UserController{
         Boolean flag = userService.add(user);
 
         if (flag) {
-            return "redirect:http://localhost:8080/smbms/jsp/user.do?method=query";
+            return "redirect:/user/list";
         } else {
             model.addAttribute("error", "添加用户失败");
-            return "useradd";
+            return "user/add";
         }
     }
 
-    @RequestMapping(params = "method=deluser")
+    @GetMapping("/delete")
     @ResponseBody
     public HashMap<String, String> delUser(@RequestParam("uid") String id) {
         HashMap<String, String> resultMap = new HashMap<>();
@@ -240,25 +242,25 @@ public class UserController{
         return resultMap;
     }
 
-    @RequestMapping(params = "method=modify")
+    @GetMapping("/modify")
     public String getUserByIdModify(@RequestParam("uid") String userId, Model model) {
         if (!StringUtils.isNullOrEmpty(userId)) {
             User user = userService.getUserById(userId);
             model.addAttribute("user", user);
         }
-        return "usermodify";
+        return "user/modify";
     }
 
-    @RequestMapping(params = "method=view")
+    @GetMapping("/view")
     public String getUserByIdView(@RequestParam("uid") String userId, Model model) {
         if (!StringUtils.isNullOrEmpty(userId)) {
             User user = userService.getUserById(userId);
             model.addAttribute("user", user);
         }
-        return "userview";
+        return "user/view";
     }
 
-    @RequestMapping(params = "method=modifyexe", method = RequestMethod.POST)
+    @PostMapping("/modify")
     public String modify(
             @RequestParam("uid") String id,
             @RequestParam("userName") String userName,
@@ -292,11 +294,16 @@ public class UserController{
         Boolean flag = userService.modify(user);
 
         if (flag) {
-            return "redirect:http://localhost:8080/smbms/jsp/user.do?method=query";
+            return "redirect:/user/list";
         } else {
             model.addAttribute("error", "修改用户失败");
-            return "usermodify";
+            return "user/modify";
         }
+    }
+
+    @GetMapping("/pwdmodify")
+    public String pwdmodifyPage() {
+        return "user/pwdmodify";
     }
 
 }
