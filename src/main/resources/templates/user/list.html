@@ -17,8 +17,8 @@
             <span>用户角色：</span>
             <select name="queryUserRole">
                 <option value="0">--请选择--</option>
-                <option th:each="role : ${roleList}" 
-                        th:value="${role.id}" 
+                <option th:each="role : ${roleList}"
+                        th:value="${role.id}"
                         th:text="${role.roleName}"
                         th:selected="${role.id == queryUserRole}"></option>
             </select>

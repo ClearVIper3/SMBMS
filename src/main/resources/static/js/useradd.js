@@ -96,9 +96,9 @@ $(function(){
 	});
 
 	userPassword.bind("focus",function(){
-		validateTip(userPassword.next(),{"color":"#666666"},"* 密码长度必须是大于6小于20",false);
+		validateTip(userPassword.next(),{"color":"#666666"},"* 密码长度必须是大于5小于20",false);
 	}).bind("blur",function(){
-		if(userPassword.val() != null && userPassword.val().length > 6
+		if(userPassword.val() != null && userPassword.val().length >= 6
 			&& userPassword.val().length < 20 ){
 			validateTip(userPassword.next(),{"color":"green"},imgYes,true);
 		}else{
@@ -107,9 +107,9 @@ $(function(){
 	});
 
 	ruserPassword.bind("focus",function(){
-		validateTip(ruserPassword.next(),{"color":"#666666"},"* 请输入与上面一只的密码",false);
+		validateTip(ruserPassword.next(),{"color":"#666666"},"* 请输入与上面一致的密码",false);
 	}).bind("blur",function(){
-		if(ruserPassword.val() != null && ruserPassword.val().length > 6
+		if(ruserPassword.val() != null && ruserPassword.val().length >= 6
 			&& ruserPassword.val().length < 20 && userPassword.val() == ruserPassword.val()){
 			validateTip(ruserPassword.next(),{"color":"green"},imgYes,true);
 		}else{

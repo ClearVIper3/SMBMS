@@ -9,7 +9,7 @@
     <ul class="page-num-ul clearfix">
         <li>共<span th:text="${totalCount}">0</span>条记录&nbsp;&nbsp; <span th:text="${currentPageNo}">1</span>/<span th:text="${totalPageCount}">1</span>页</li>
         <li th:if="${currentPageNo > 1}">
-            <a href="javascript:page_nav(document.forms[0],1);">首页</a>
+            <a th:href="'javascript:page_nav(document.forms[0],1);'">首页</a>
             <a th:href="'javascript:page_nav(document.forms[0],' + ${currentPageNo-1} + ');'">上一页</a>
         </li>
         <li th:if="${currentPageNo < totalPageCount}">
@@ -23,7 +23,4 @@
          <button type="button" class="page-btn" onClick='jump_to(document.forms[0],document.getElementById("inputPage").value)'>GO</button>
     </span>
 </div>
-<script type="text/javascript" th:src="@{/js/rollpage.js}"></script>
-</body>
-</html>
 

@@ -45,7 +45,7 @@ $(function(){
 	});
 
 	newpassword.on("focus",function(){
-		validateTip(newpassword.next(),{"color":"#666666"},"* 密码长度必须是大于6小于20",false);
+		validateTip(newpassword.next(),{"color":"#666666"},"* 密码长度必须是大于5小于20",false);
 	}).on("blur",function(){
 		if(newpassword.val() != null && newpassword.val().length >= 6
 			&& newpassword.val().length < 20 ){
