@@ -12,14 +12,16 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("redirect:login.jsp");
+        registry.addViewController("/").setViewName("redirect:/login");
+        registry.addViewController("/login").setViewName("login");
+        registry.addViewController("/frame").setViewName("frame");
     }
 
     @Bean
     public FilterRegistrationBean<SysFilter> sysFilter() {
         FilterRegistrationBean<SysFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new SysFilter());
-        registrationBean.addUrlPatterns("/jsp/*");
+        registrationBean.addUrlPatterns("/bill/*", "/provider/*", "/user/*", "/frame");
         return registrationBean;
     }
 }

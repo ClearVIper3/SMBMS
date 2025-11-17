@@ -11,19 +11,17 @@ server:
 
 spring:
   mvc:
-    view:
-      prefix: /jsp/
-      suffix: .jsp
     static-path-pattern: /**
-  web:
-    resources:
-      static-locations: file:src/main/webapp/
   devtools:
     restart:
       enabled: true
 
   thymeleaf:
-    enabled: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
 
   datasource:
     username: root

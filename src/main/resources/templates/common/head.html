@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:fragment="head">
+  <meta charset="UTF-8">
+  <title>超市订单管理系统</title>
+  <link type="text/css" rel="stylesheet" th:href="@{/css/style.css}" />
+  <link type="text/css" rel="stylesheet" th:href="@{/css/public.css}" />
+</head>
+
+<body th:fragment="body">
+<!--头部-->
+<header class="publicHeader">
+  <h1>超市订单管理系统</h1>
+  <div class="publicHeaderR">
+    <p><span>下午好！</span><span style="color: #fff21b" th:text="${session.USER_SESSION?.userName}">用户名</span> , 欢迎你！</p>
+    <a th:href="@{/user/logout}" onclick="return confirm('您真的要退出吗？')">退出</a>
+  </div>
+</header>
+<!--时间-->
+<section class="publicTime">
+  <span id="time"></span>
+  <a href="#">温馨提示：为了能正常浏览，请使用高版本浏览器！（IE10+）</a>
+</section>
+<!--主体内容-->
+<section class="publicMian ">
+  <div class="left">
+    <h2 class="leftH2"><span class="span1"></span>功能列表 <span></span></h2>
+    <nav>
+      <ul class="list">
+        <li><a th:href="@{/bill/list}">订单管理</a></li>
+        <li><a th:href="@{/provider/list}">供应商管理</a></li>
+        <li><a th:href="@{/user/list}">用户管理</a></li>
+        <li><a th:href="@{/user/pwdmodify}">密码修改</a></li>
+        <li><a th:href="@{/user/logout}">退出系统</a></li>
+      </ul>
+    </nav>
+  </div>
+  <script th:src="@{/js/time.js}"></script>
+  <input type="hidden" id="path" th:value="@{/}" />

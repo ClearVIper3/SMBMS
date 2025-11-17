@@ -9,6 +9,8 @@ import com.viper.utils.Constants;
 import com.mysql.cj.util.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequestMapping("/jsp/bill.do")
+@RequestMapping("/bill")
 public class BillController{
 
     private final BillService billService;
@@ -33,7 +35,7 @@ public class BillController{
         this.providerService = providerService;
     }
 
-    @RequestMapping(params = "method=query")
+    @GetMapping("/list")
     public String query(
             @RequestParam(value = "queryProductName", required = false) String queryProductName,
             @RequestParam(value = "queryProviderId", required = false) String queryProviderId,
@@ -66,28 +68,28 @@ public class BillController{
         model.addAttribute("queryProviderId", queryProviderId);
         model.addAttribute("queryIsPayment", queryIsPayment);
 
-        return "billlist";
+        return "bill/list";
     }
 
-    @RequestMapping(params = "method=view")
+    @GetMapping("/view")
     public String getBillById(@RequestParam("billid") String billId, Model model) {
         if (!StringUtils.isNullOrEmpty(billId)) {
             Bill bill = billService.getBillById(billId);
             model.addAttribute("bill", bill);
         }
-        return "billview";
+        return "bill/view";
     }
 
-    @RequestMapping(params = "method=modify")
+    @GetMapping("/modify")
     public String getBillByIdModify(@RequestParam("billid") String billId, Model model) {
         if (!StringUtils.isNullOrEmpty(billId)) {
             Bill bill = billService.getBillById(billId);
             model.addAttribute("bill", bill);
         }
-        return "billmodify";
+        return "bill/modify";
     }
 
-    @RequestMapping(params = "method=modifysave", method = RequestMethod.POST)
+    @PostMapping("/modify")
     public String modify(
             @RequestParam("id") Integer id,
             @RequestParam("productName") String productName,
@@ -117,13 +119,13 @@ public class BillController{
 
         boolean flag = billService.modify(bill);
         if (flag) {
-            return "redirect:/jsp/bill.do?method=query";
+            return "redirect:/bill/list";
         } else {
-            return "billmodify";
+            return "bill/modify";
         }
     }
 
-    @RequestMapping(params = "method=delbill")
+    @GetMapping("/delete")
     @ResponseBody
     public HashMap<String, String> delBill(@RequestParam("billid") String billId) {
         HashMap<String, String> resultMap = new HashMap<>();
@@ -140,7 +142,12 @@ public class BillController{
         return resultMap;
     }
 
-    @RequestMapping(params = "method=add", method = RequestMethod.POST)
+    @GetMapping("/add")
+    public String addPage() {
+        return "bill/add";
+    }
+
+    @PostMapping("/add")
     public String add(
             @RequestParam("billCode") String billCode,
             @RequestParam("productName") String productName,
@@ -170,13 +177,13 @@ public class BillController{
         System.out.println("add flag -- > " + flag);
 
         if (flag) {
-            return "redirect:/jsp/bill.do?method=query";
+            return "redirect:/bill/list";
         } else {
-            return "billadd";
+            return "bill/add";
         }
     }
 
-    @RequestMapping(params = "method=getproviderlist")
+    @GetMapping("/getproviderlist")
     @ResponseBody
     public List<Provider> getProviderlist() {
         System.out.println("getproviderlist ========================= ");
