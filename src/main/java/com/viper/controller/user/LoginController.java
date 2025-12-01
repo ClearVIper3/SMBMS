@@ -28,8 +28,6 @@ public class LoginController{
             HttpSession session,
             Model model) {
 
-        System.out.println("LoginServlet--start...");
-
         // 和数据库的密码进行比较，调用业务层
         User user = userService.Login(userCode);
 

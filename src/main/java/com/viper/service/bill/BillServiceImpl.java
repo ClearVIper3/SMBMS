@@ -12,7 +12,7 @@ import java.util.List;
 @Transactional
 public class BillServiceImpl implements BillService{
 
-    //业务层都会调用dao层，所以我们要引入Dao层；
+    //业务层都会调用dao层，所以我们要引入Dao层
     private final BillMapper billMapper;
 
     public BillServiceImpl(BillMapper billMapper) {

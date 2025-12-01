@@ -185,8 +185,6 @@ public class UserController{
             HttpSession session,
             Model model) {
 
-        System.out.println("当前正在执行增加用户操作");
-
         User user = new User();
         user.setUserCode(userCode);
         user.setUserName(userName);

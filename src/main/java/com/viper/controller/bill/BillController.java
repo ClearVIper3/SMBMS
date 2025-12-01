@@ -101,8 +101,6 @@ public class BillController{
             @RequestParam("isPayment") Integer isPayment,
             HttpSession session) {
 
-        System.out.println("modify===============");
-
         Bill bill = new Bill();
         bill.setId(id);
         bill.setProductName(productName);
@@ -174,7 +172,6 @@ public class BillController{
         bill.setCreationDate(new Date());
 
         boolean flag = billService.add(bill);
-        System.out.println("add flag -- > " + flag);
 
         if (flag) {
             return "redirect:/bill/list";
@@ -186,7 +183,6 @@ public class BillController{
     @GetMapping("/getproviderlist")
     @ResponseBody
     public List<Provider> getProviderlist() {
-        System.out.println("getproviderlist ========================= ");
         return providerService.getProviderList("", "");
     }
 }
