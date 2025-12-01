@@ -1,5 +1,7 @@
 package com.viper.service.provider;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.viper.dao.bill.BillMapper;
 import com.viper.dao.provider.ProviderMapper;
 import com.viper.pojo.Provider;
@@ -54,12 +56,18 @@ public class ProviderServiceImpl implements ProviderService {
     @Override
     public List<Provider> getProviderList(String proName, String proCode) {
 
-        List<Provider> providerList = null;
-        try {
-            providerList = providerMapper.getProviderList(proName,proCode);
-        } catch (Exception e) {
-            e.printStackTrace();
+        QueryWrapper<Provider> wrapper = new QueryWrapper<>();
+
+        if (StringUtils.isNotBlank(proName)) {
+            wrapper.like("proName", proName);
         }
-        return providerList;
+        if (StringUtils.isNotBlank(proCode)) {
+            wrapper.like("proCode", proCode);
+        }
+
+        // 添加排序
+        wrapper.orderByAsc("id");
+
+        return providerMapper.selectList(wrapper);
     }
 }
