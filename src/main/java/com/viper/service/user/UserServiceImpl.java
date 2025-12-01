@@ -1,11 +1,8 @@
 package com.viper.service.user;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.viper.dao.user.UserMapper;
 import com.viper.pojo.User;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -41,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean PasswordModify(int id, String password) {
 
-        UpdateWrapper<User> updateWrapper = new UpdateWrapper<User>();
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
 
         updateWrapper.eq("id",id);
         updateWrapper.set("userPassword",password);
@@ -95,7 +92,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(String id) {
-        return  userMapper.selectById(id);
+        User user = new User();
+
+        try {
+            user = userMapper.getUserById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  user;
     }
 
     @Override

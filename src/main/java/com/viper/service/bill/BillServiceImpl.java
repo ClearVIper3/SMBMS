@@ -39,7 +39,13 @@ public class BillServiceImpl implements BillService{
     }
 
     public Bill getBillById(String id) {
-        return billMapper.selectById(id);
+        Bill bill = new Bill();
+        try {
+            bill = billMapper.getBillById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bill;
     }
 
     public boolean modify(Bill bill) {

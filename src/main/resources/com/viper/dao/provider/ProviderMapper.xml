@@ -5,12 +5,6 @@
 
 <mapper namespace="com.viper.dao.provider.ProviderMapper">
 
-    <insert id="add" parameterType="provider">
-        insert into smbms_provider (proCode,proName,proDesc,
-        proContact,proPhone,userAddress,userFax,createdBy,creationDate)
-        values(#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},#{userAddress},#{userFax},#{createdBy},#{creationDate})
-    </insert>
-
     <select id="getProviderList" resultType="provider">
         select * from smbms_provider
         <where>
@@ -22,17 +16,4 @@
             </if>
         </where>
     </select>
-
-    <delete id="deleteProviderById" parameterType="string">
-        delete from smbms_provider where id=#{delId}
-    </delete>
-
-    <select id="getProviderById" parameterType="string" resultType="provider">
-        select * from smbms_provider where id=#{id}
-    </select>
-
-    <update id="modify" parameterType="provider">
-        update smbms_provider set proName=#{proName},proDesc=#{proDesc},proContact=#{proContact},
-        proPhone=#{proPhone},userAddress=#{userAddress},userFax=#{userFax},modifyBy=#{modifyBy},modifyDate=#{modifyDate} where id = #{id}
-    </update>
 </mapper>

@@ -18,6 +18,14 @@ public interface BillMapper extends BaseMapper<Bill> {
     public List<Bill> getBillList(Bill bill)throws Exception;
 
     /**
+     * 通过billId获取Bill
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public Bill getBillById(@Param("id") String id)throws Exception;
+
+    /**
      * 根据供应商ID查询订单数量
      * @param providerId
      * @return
