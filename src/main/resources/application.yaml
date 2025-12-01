@@ -42,7 +42,7 @@ mybatis-plus:
   type-aliases-package: com.viper.pojo
   mapper-locations: classpath:com/viper/dao/**/*.xml
   configuration:
-    map-underscore-to-camel-case: true
+    map-underscore-to-camel-case: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 logging:
