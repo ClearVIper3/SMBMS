@@ -37,12 +37,13 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
-mybatis:
+mybatis-plus:
+  # MyBatis-Plus 配置
+  type-aliases-package: com.viper.pojo
+  mapper-locations: classpath:com/viper/dao/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  type-aliases-package: com.viper.pojo
-  mapper-locations: classpath:com/viper/dao/**/*.xml
 
 logging:
   level:
