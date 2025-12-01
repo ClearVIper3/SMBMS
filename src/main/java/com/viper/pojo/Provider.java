@@ -21,4 +21,3 @@ public class Provider {
     private Integer modifyBy; //更新者
     private Date modifyDate;//更新时间
 }
-

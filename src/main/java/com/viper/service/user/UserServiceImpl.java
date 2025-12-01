@@ -1,5 +1,6 @@
 package com.viper.service.user;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.viper.dao.user.UserMapper;
 import com.viper.pojo.User;
@@ -24,15 +25,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User Login(String userCode, String password) {
+    public User Login(String userCode) {
 
-        User user = null;
-        try{
-            user = userMapper.getLoginUser(userCode);
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-        return user;
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("userCode",userCode);
+
+        return userMapper.selectOne(wrapper);
     }
 
     @Override
@@ -75,14 +73,10 @@ public class UserServiceImpl implements UserService {
 
     public User selectUserCodeExist(String userCode) {
 
-        User user = null;
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("userCode",userCode);
 
-        try {
-            user = userMapper.getLoginUser(userCode);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return user;
+        return userMapper.selectOne(wrapper);
     }
 
     @Override

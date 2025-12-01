@@ -10,7 +10,7 @@ public interface ProviderService {
      * @param provider
      * @return
      */
-    public boolean add(Provider provider);
+    boolean add(Provider provider);
 
 
     /**
@@ -18,14 +18,14 @@ public interface ProviderService {
      * @param proName
      * @return
      */
-    public List<Provider> getProviderList(String proName, String proCode);
+    List<Provider> getProviderList(String proName, String proCode);
 
     /**
      * 通过proId删除Provider
      * @param delId
      * @return
      */
-    public int deleteProviderById(String delId);
+    int deleteProviderById(String delId);
 
 
     /**
@@ -33,10 +33,10 @@ public interface ProviderService {
      * @param id
      * @return
      */
-    public Provider getProviderById(String id);
+    Provider getProviderById(String id);
 
     /**
      * 修改用户信息
      */
-    public boolean modify(Provider provider);
+    boolean modify(Provider provider);
 }

@@ -11,7 +11,7 @@ public interface BillService {
      * @param bill
      * @return
      */
-    public boolean add(Bill bill);
+    boolean add(Bill bill);
 
 
     /**
@@ -19,14 +19,14 @@ public interface BillService {
      * @param bill
      * @return
      */
-    public List<Bill> getBillList(Bill bill);
+    List<Bill> getBillList(Bill bill);
 
     /**
      * 通过billId删除Bill
      * @param delId
      * @return
      */
-    public boolean deleteBillById(String delId);
+    boolean deleteBillById(String delId);
 
 
     /**
@@ -34,12 +34,12 @@ public interface BillService {
      * @param id
      * @return
      */
-    public Bill getBillById(String id);
+    Bill getBillById(String id);
 
     /**
      * 修改订单信息
      * @param bill
      * @return
      */
-    public boolean modify(Bill bill);
+    boolean modify(Bill bill);
 }

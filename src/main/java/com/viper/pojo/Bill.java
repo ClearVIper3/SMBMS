@@ -1,5 +1,6 @@
 package com.viper.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -23,6 +24,6 @@ public class Bill {
     private Integer modifyBy; //更新者
     private Date modifyDate;//更新时间
 
+    @TableField(exist = false)
     private String providerName;//供应商名称
 }
-

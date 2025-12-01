@@ -4,9 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.viper.dao.user.UserMapper">
-    <select id="getLoginUser" parameterType="string" resultType="user">
-        select * from smbms_user where userCode = #{userCode}
-    </select>
 
     <select id="getUserCount" resultType="int">
         select count(1) as count from smbms_user u,smbms_role r

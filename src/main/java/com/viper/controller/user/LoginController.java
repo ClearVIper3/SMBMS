@@ -31,7 +31,7 @@ public class LoginController{
         System.out.println("LoginServlet--start...");
 
         // 和数据库的密码进行比较，调用业务层
-        User user = userService.Login(userCode, password);
+        User user = userService.Login(userCode);
 
         if (user != null && user.getUserPassword().equals(password)) {
             // 查有此人，将此人信息存入Session

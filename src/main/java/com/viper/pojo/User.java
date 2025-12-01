@@ -1,5 +1,6 @@
 package com.viper.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -21,7 +22,9 @@ public class User {
     private Date creationDate;  //创建时间
     private Integer modifyBy;   //更新者
     private Date modifyDate;    //更新时间
+
+    @TableField(exist = false)
     private Integer age;    //年龄
+    @TableField(exist = false)
     private String userRoleName;    //用户角色名称
 }
-

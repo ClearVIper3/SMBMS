@@ -15,7 +15,7 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @return
      * @throws Exception
      */
-    public List<Bill> getBillList(Bill bill)throws Exception;
+    List<Bill> getBillList(Bill bill)throws Exception;
 
     /**
      * 通过billId获取Bill
@@ -23,7 +23,7 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @return
      * @throws Exception
      */
-    public Bill getBillById(@Param("id") String id)throws Exception;
+    Bill getBillById(@Param("id") String id)throws Exception;
 
     /**
      * 根据供应商ID查询订单数量
@@ -31,5 +31,5 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @return
      * @throws Exception
      */
-    public int getBillCountByProviderId(@Param("providerId")String providerId) throws Exception;
+    int getBillCountByProviderId(@Param("providerId")String providerId) throws Exception;
 }
