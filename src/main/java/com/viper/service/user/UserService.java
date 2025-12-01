@@ -8,18 +8,18 @@ public interface UserService {
     //用户登录
     User Login(String userCode);
 
-    Boolean PasswordModify(int id, String password);
+    Boolean PasswordModify(Long id, String password);
 
-    int getUserCount(String username,int userRole);
+    int getUserCount(String username,Integer userRole);
 
-    List<User> getUserList(String queryUserName, int queryUserRole, int currentPageNo, int pageSize);
+    List<User> getUserList(String queryUserName, Integer queryUserRole, Integer currentPageNo, Integer pageSize);
 
     //根据用户编码，判断用户是否存在
     User selectUserCodeExist(String userCode);
 
     Boolean add(User user);
 
-    Boolean deleteUserById(int delid);
+    Boolean deleteUserById(Integer delid);
 
     User getUserById(String id);
 

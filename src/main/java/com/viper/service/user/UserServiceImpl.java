@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean PasswordModify(int id, String password) {
+    public Boolean PasswordModify(Long id, String password) {
 
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
 
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int getUserCount(String username, int userRole) {
+    public int getUserCount(String username, Integer userRole) {
 
         int count = 0;
 
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUserList(String queryUserName, int queryUserRole, int currentPageNo, int pageSize) {
+    public List<User> getUserList(String queryUserName, Integer queryUserRole, Integer currentPageNo, Integer pageSize) {
 
         int startIndex = (currentPageNo - 1) * pageSize;
         List<User> userList = null;
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean deleteUserById(int delId) {
+    public Boolean deleteUserById(Integer delId) {
         return userMapper.deleteById(delId) > 0;
     }
 }

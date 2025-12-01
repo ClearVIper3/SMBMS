@@ -199,7 +199,7 @@ public class UserController{
             e.printStackTrace();
         }
 
-        user.setUserRole(Integer.valueOf(userRole));
+        user.setUserRole(Long.valueOf(userRole));
         user.setCreationDate(new Date());
 
         User currentUser = (User) session.getAttribute(Constants.USER_SESSION);
@@ -219,7 +219,7 @@ public class UserController{
     @ResponseBody
     public HashMap<String, String> delUser(@RequestParam("uid") String id) {
         HashMap<String, String> resultMap = new HashMap<>();
-        Integer delId = 0;
+        int delId;
 
         try {
             delId = Integer.parseInt(id);
@@ -271,7 +271,7 @@ public class UserController{
             Model model) {
 
         User user = new User();
-        user.setId(Integer.valueOf(id));
+        user.setId(Long.valueOf(id));
         user.setUserName(userName);
         user.setGender(Integer.valueOf(gender));
 
@@ -283,7 +283,7 @@ public class UserController{
 
         user.setPhone(phone);
         user.setAddress(address);
-        user.setUserRole(Integer.valueOf(userRole));
+        user.setUserRole(Long.valueOf(userRole));
 
         User currentUser = (User) session.getAttribute(Constants.USER_SESSION);
         user.setModifyBy(currentUser.getId());

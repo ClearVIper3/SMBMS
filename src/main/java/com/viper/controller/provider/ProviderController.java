@@ -126,7 +126,7 @@ public class ProviderController{
 
     @PostMapping("/modify")
     public String modify(
-            @RequestParam("id") Integer id,
+            @RequestParam("id") Long id,
             @RequestParam("proName") String proName,
             @RequestParam("proContact") String proContact,
             @RequestParam("proPhone") String proPhone,

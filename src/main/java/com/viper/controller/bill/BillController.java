@@ -12,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -56,9 +55,9 @@ public class BillController{
             bill.setIsPayment(Integer.parseInt(queryIsPayment));
         }
         if (StringUtils.isNullOrEmpty(queryProviderId)) {
-            bill.setProviderId(0);
+            bill.setProviderId(0L);
         } else {
-            bill.setProviderId(Integer.parseInt(queryProviderId));
+            bill.setProviderId(Long.parseLong(queryProviderId));
         }
         bill.setProductName(queryProductName);
 
@@ -91,13 +90,13 @@ public class BillController{
 
     @PostMapping("/modify")
     public String modify(
-            @RequestParam("id") Integer id,
+            @RequestParam("id") Long id,
             @RequestParam("productName") String productName,
             @RequestParam(value = "productDesc", required = false) String productDesc,
             @RequestParam("productUnit") String productUnit,
             @RequestParam("productCount") String productCount,
             @RequestParam("totalPrice") String totalPrice,
-            @RequestParam("providerId") Integer providerId,
+            @RequestParam("providerId") Long providerId,
             @RequestParam("isPayment") Integer isPayment,
             HttpSession session) {
 
@@ -153,7 +152,7 @@ public class BillController{
             @RequestParam("productUnit") String productUnit,
             @RequestParam("productCount") String productCount,
             @RequestParam("totalPrice") String totalPrice,
-            @RequestParam("providerId") Integer providerId,
+            @RequestParam("providerId") Long providerId,
             @RequestParam("isPayment") Integer isPayment,
             HttpSession session) {
 
