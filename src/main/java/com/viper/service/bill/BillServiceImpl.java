@@ -20,30 +20,12 @@ public class BillServiceImpl implements BillService{
     }
 
     public boolean add(Bill bill) {
-
-        boolean flag = false;
-        try {
-            int updateRows = billMapper.add(bill);
-            System.out.println("dao--------修改行数 " + updateRows);
-            if(updateRows > 0){
-                flag = true;
-                System.out.println("add success!");
-            }else{
-                System.out.println("add failed!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("rollback==================");
-        }
-        return flag;
+        return billMapper.insert(bill) > 0;
     }
 
     public List<Bill> getBillList(Bill bill) {
 
         List<Bill> billList = new ArrayList<>();
-        System.out.println("query productName ---- > " + bill.getProductName());
-        System.out.println("query providerId ---- > " + bill.getProviderId());
-        System.out.println("query isPayment ---- > " + bill.getIsPayment());
         try {
             billList= billMapper.getBillList(bill);
         } catch (Exception e) {
@@ -53,43 +35,14 @@ public class BillServiceImpl implements BillService{
     }
 
     public boolean deleteBillById(String delId) {
-
-        boolean flag=false;
-        int delNum;
-        try {
-            delNum= billMapper.deleteBillById(delId);
-            if(delNum>0){
-                flag=true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
+        return billMapper.deleteById(delId) > 0;
     }
 
     public Bill getBillById(String id) {
-
-        Bill bill = new Bill();
-        try {
-            bill = billMapper.getBillById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return bill;
+        return billMapper.selectById(id);
     }
 
     public boolean modify(Bill bill) {
-
-        boolean flag=false;
-        int modifyNum;
-        try {
-            modifyNum= billMapper.modify(bill);
-            if(modifyNum>0){
-                flag=true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
+        return billMapper.updateById(bill) > 0;
     }
 }

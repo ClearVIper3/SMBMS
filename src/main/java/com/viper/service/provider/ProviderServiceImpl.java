@@ -22,16 +22,7 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public boolean add(Provider provider) {
-
-        boolean flag = false;
-        try{
-            if(providerMapper.add(provider) > 0)
-                flag = true;
-        } catch(Exception ex) {
-            ex.printStackTrace();
-            System.out.println("ProviderAddRollback====================");
-        }
-        return flag;
+        return providerMapper.insert(provider) > 0;
     }
 
     @Override
@@ -41,7 +32,7 @@ public class ProviderServiceImpl implements ProviderService {
         try{
             billCount = billMapper.getBillCountByProviderId(delId);
             if(billCount == 0) {
-                providerMapper.deleteProviderById(delId);
+                providerMapper.deleteById(delId);
             }
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -52,35 +43,18 @@ public class ProviderServiceImpl implements ProviderService {
 
     @Override
     public Provider getProviderById(String id) {
-
-        Provider provider;
-        try{
-            provider = providerMapper.getProviderById(id);
-        }catch (Exception e) {
-            e.printStackTrace();
-            provider = null;
-        }
-        return provider;
+        return providerMapper.selectById(id);
     }
 
     @Override
     public boolean modify(Provider provider) {
-        boolean flag = false;
-        try{
-            if(providerMapper.modify(provider) > 0)
-                flag = true;
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return flag;
+        return providerMapper.updateById(provider) > 0;
     }
 
     @Override
     public List<Provider> getProviderList(String proName, String proCode) {
 
         List<Provider> providerList = null;
-        System.out.println("query proName ---- > " + proName);
-        System.out.println("query proCode ---- > " + proCode);
         try {
             providerList = providerMapper.getProviderList(proName,proCode);
         } catch (Exception e) {

@@ -1,5 +1,8 @@
 package com.viper.service.user;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.viper.dao.user.UserMapper;
 import com.viper.pojo.User;
 import java.sql.SQLException;
@@ -20,22 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean modify(User user) {
-
-        boolean flag=false;
-        try {
-            int updateNum = userMapper.modify(user);//执行修改sql
-            if(updateNum>0){
-                flag=true;
-                System.out.println("修改用户成功");
-            }else{
-                System.out.println("修改用户失败");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            //若抛出异常，则说明修改失败需要回滚
-            System.out.println("修改失败，回滚事务");
-        }
-        return flag;
+        return userMapper.updateById(user) > 0;
     }
 
     @Override
@@ -53,14 +41,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean PasswordModify(int id, String password) {
 
-        //System.out.println("Service" + password);
-        boolean flag;
-        try {
-            flag = userMapper.UserPasswordModify(id, password) > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return flag;
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<User>();
+
+        updateWrapper.eq("id",id);
+        updateWrapper.set("userPassword",password);
+
+        return userMapper.update(updateWrapper) > 0;
     }
 
     @Override
@@ -82,10 +68,6 @@ public class UserServiceImpl implements UserService {
         int startIndex = (currentPageNo - 1) * pageSize;
         List<User> userList = null;
 
-        System.out.println("queryUserName ---- > " + queryUserName);
-        System.out.println("queryUserRole ---- > " + queryUserRole);
-        System.out.println("currentPageNo ---- > " + currentPageNo);
-        System.out.println("pageSize ---- > " + pageSize);
         try {
             userList = userMapper.getUserList(queryUserName,queryUserRole,startIndex,pageSize);
         } catch (Exception e) {
@@ -108,48 +90,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean add(User user) {
-
-        boolean flag = false;
-
-        try {
-            int updateRows = userMapper.add(user);
-            if(updateRows > 0){
-                flag = true;
-                System.out.println("add success!");
-            }else{
-                System.out.println("add failed!");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("rollback==================");
-        }
-        return flag;
+        return userMapper.insert(user) > 0;
     }
 
     @Override
     public User getUserById(String id) {
-        User user = new User();
-
-        try {
-            user = userMapper.getUserById(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return  user;
+        return  userMapper.selectById(id);
     }
 
     @Override
     public Boolean deleteUserById(int delId) {
-        boolean flag=false;
-
-        try {
-            int deleteNum= userMapper.deleteUserById(delId);
-            if(deleteNum>0)
-                flag=true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
+        return userMapper.deleteById(delId) > 0;
     }
 }

@@ -1,10 +1,12 @@
 package com.viper.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@TableName("`smbms_provider`")
 public class Provider {
     private Integer id;   //id
     private String proCode; //供应商编码

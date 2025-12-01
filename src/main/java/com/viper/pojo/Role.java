@@ -1,10 +1,12 @@
 package com.viper.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@TableName("`smbms_role`")
 public class Role {
     private Integer id;             //id
     private String roleCode;        //角色编码

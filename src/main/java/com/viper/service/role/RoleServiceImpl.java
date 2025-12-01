@@ -20,13 +20,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getRoleList() {
-        List<Role> roles = null;
-
-        try{
-            roles = roleMapper.getRoleList();
-        } catch(SQLException e){
-            e.printStackTrace();
-        }
-        return roles;
+        return roleMapper.selectList(null);
     }
 }

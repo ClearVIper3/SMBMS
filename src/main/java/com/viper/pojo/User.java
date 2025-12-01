@@ -1,10 +1,12 @@
 package com.viper.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@TableName("`smbms_user`")
 public class User {
     private Integer id;     //id
     private String userCode;    //用户编码
