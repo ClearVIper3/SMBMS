@@ -37,23 +37,12 @@ build/
 ### Mac OS ###
 .DS_Store# IDE
 .idea/
-*.iml
 
 # Build outputs
 out/
 
 # SVN
 .svn/
-
-# IDE
-.idea/
-*.iml
-
-# Build outputs
-target/
-out/
-
-# System files
 
 .DS_Store
 Thumbs.db
