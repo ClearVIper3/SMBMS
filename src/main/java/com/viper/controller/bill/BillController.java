@@ -1,5 +1,6 @@
 package com.viper.controller.bill;
 
+import com.viper.exception.BusinessException;
 import com.viper.pojo.Bill;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;
@@ -98,7 +99,8 @@ public class BillController{
             @RequestParam("totalPrice") String totalPrice,
             @RequestParam("providerId") Long providerId,
             @RequestParam("isPayment") Integer isPayment,
-            HttpSession session) {
+            HttpSession session,
+            Model model) {
 
         Bill bill = new Bill();
         bill.setId(id);
@@ -114,12 +116,17 @@ public class BillController{
         bill.setModifyBy(user.getId());
         bill.setModifyDate(new Date());
 
-        boolean flag = billService.modify(bill);
-        if (flag) {
-            return "redirect:/bill/list";
-        } else {
-            return "bill/modify";
+        try {
+            boolean flag = billService.modify(bill);
+            if (flag) {
+                return "redirect:/bill/list";
+            }
+            model.addAttribute("error", "修改订单失败");
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("bill", bill);
+        return "bill/modify";
     }
 
     @GetMapping("/delete")
@@ -154,7 +161,8 @@ public class BillController{
             @RequestParam("totalPrice") String totalPrice,
             @RequestParam("providerId") Long providerId,
             @RequestParam("isPayment") Integer isPayment,
-            HttpSession session) {
+            HttpSession session,
+            Model model) {
 
         Bill bill = new Bill();
         bill.setBillCode(billCode);
@@ -170,13 +178,18 @@ public class BillController{
         bill.setCreatedBy(user.getId());
         bill.setCreationDate(new Date());
 
-        boolean flag = billService.add(bill);
-
-        if (flag) {
-            return "redirect:/bill/list";
-        } else {
-            return "bill/add";
+        try {
+            boolean flag = billService.add(bill);
+            if (flag) {
+                return "redirect:/bill/list";
+            }
+            model.addAttribute("error", "添加订单失败");
+        } catch (BusinessException e) {
+            // 订单编码重复（唯一约束）、供应商不存在（外键约束）等友好提示
+            model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("bill", bill);
+        return "bill/add";
     }
 
     @GetMapping("/getproviderlist")

@@ -1,6 +1,7 @@
 package com.viper.controller.provider;
 
 import com.mysql.cj.util.StringUtils;
+import com.viper.exception.BusinessException;
 import com.viper.pojo.Provider;
 import com.viper.pojo.User;
 import com.viper.service.provider.ProviderService;
@@ -83,7 +84,8 @@ public class ProviderController{
             @RequestParam("userAddress") String userAddress,
             @RequestParam("proFax") String proFax,
             @RequestParam("proDesc") String proDesc,
-            HttpSession session) {
+            HttpSession session,
+            Model model) {
 
         Provider provider = new Provider();
         provider.setProCode(proCode);
@@ -98,12 +100,18 @@ public class ProviderController{
         provider.setCreatedBy(user.getId());
         provider.setCreationDate(new Date());
 
-        boolean flag = providerService.add(provider);
-        if (flag) {
-            return "redirect:/provider/list";
-        } else {
-            return "provider/add";
+        try {
+            boolean flag = providerService.add(provider);
+            if (flag) {
+                return "redirect:/provider/list";
+            }
+            model.addAttribute("error", "添加供应商失败");
+        } catch (BusinessException e) {
+            // 供应商编码重复等唯一约束冲突友好提示
+            model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("provider", provider);
+        return "provider/add";
     }
 
     @GetMapping("/view")
@@ -133,7 +141,8 @@ public class ProviderController{
             @RequestParam("userAddress") String userAddress,
             @RequestParam("userFax") String userFax,
             @RequestParam("proDesc") String proDesc,
-            HttpSession session) {
+            HttpSession session,
+            Model model) {
 
         Provider provider = new Provider();
         provider.setId(id);
@@ -148,11 +157,16 @@ public class ProviderController{
         provider.setModifyBy(user.getId());
         provider.setModifyDate(new Date());
 
-        boolean flag = providerService.modify(provider);
-        if (flag) {
-            return "redirect:/provider/list";
-        } else {
-            return "provider/modify";
+        try {
+            boolean flag = providerService.modify(provider);
+            if (flag) {
+                return "redirect:/provider/list";
+            }
+            model.addAttribute("error", "修改供应商失败");
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("provider", provider);
+        return "provider/modify";
     }
 }

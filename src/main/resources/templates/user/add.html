@@ -10,17 +10,21 @@
         <span>用户管理页面 >> 用户添加页面</span>
     </div>
     <div class="providerAdd">
+        <!-- 后端错误提示：员工编码重复、角色不存在等 -->
+        <div th:if="${error}" style="color:#fff;background:#e74c3c;padding:10px 15px;margin:10px 0;border-radius:4px;">
+            <strong>提示：</strong><span th:text="${error}"></span>
+        </div>
         <form id="userForm" name="userForm" method="post" th:action="@{/user/add}">
             <!--div的class 为error是验证错误，ok是验证成功-->
             <div>
                 <label for="userCode">用户编码：</label>
-                <input type="text" name="userCode" id="userCode" value="">
+                <input type="text" name="userCode" id="userCode" th:value="${user != null} ? ${user.userCode} : ''">
                 <!-- 放置提示信息 -->
                 <font color="red"></font>
             </div>
             <div>
                 <label for="userName">用户名称：</label>
-                <input type="text" name="userName" id="userName" value="">
+                <input type="text" name="userName" id="userName" th:value="${user != null} ? ${user.userName} : ''">
                 <font color="red"></font>
             </div>
             <div>
@@ -48,12 +52,12 @@
             </div>
             <div>
                 <label for="phone">用户电话：</label>
-                <input type="text" name="phone" id="phone" value="">
+                <input type="text" name="phone" id="phone" th:value="${user != null} ? ${user.phone} : ''">
                 <font color="red"></font>
             </div>
             <div>
                 <label for="address">用户地址：</label>
-                <input name="address" id="address" value="">
+                <input name="address" id="address" th:value="${user != null} ? ${user.address} : ''">
             </div>
             <div>
                 <label>用户角色：</label>

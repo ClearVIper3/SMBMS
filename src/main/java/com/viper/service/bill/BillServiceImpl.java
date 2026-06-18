@@ -1,7 +1,10 @@
 package com.viper.service.bill;
 
 import com.viper.dao.bill.BillMapper;
+import com.viper.exception.BusinessException;
+import com.viper.exception.DbExceptionTranslator;
 import com.viper.pojo.Bill;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +23,13 @@ public class BillServiceImpl implements BillService{
     }
 
     public boolean add(Bill bill) {
-        return billMapper.insert(bill) > 0;
+        try {
+            return billMapper.insert(bill) > 0;
+        } catch (DataAccessException e) {
+            // 捕获订单编码重复（唯一约束）、供应商不存在（外键约束）等异常
+            BusinessException be = DbExceptionTranslator.translate(e);
+            throw be != null ? be : new BusinessException("添加订单失败，请稍后重试", e);
+        }
     }
 
     public List<Bill> getBillList(Bill bill) {
@@ -49,6 +58,11 @@ public class BillServiceImpl implements BillService{
     }
 
     public boolean modify(Bill bill) {
-        return billMapper.updateById(bill) > 0;
+        try {
+            return billMapper.updateById(bill) > 0;
+        } catch (DataAccessException e) {
+            BusinessException be = DbExceptionTranslator.translate(e);
+            throw be != null ? be : new BusinessException("修改订单失败，请稍后重试", e);
+        }
     }
 }

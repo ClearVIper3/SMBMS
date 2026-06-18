@@ -10,6 +10,9 @@
     <span>用户管理页面 >> 用户修改页面</span>
   </div>
   <div class="providerAdd">
+    <div th:if="${error}" style="color:#fff;background:#e74c3c;padding:10px 15px;margin:10px 0;border-radius:4px;">
+      <strong>提示：</strong><span th:text="${error}"></span>
+    </div>
     <form id="userForm" name="userForm" method="post" th:action="@{/user/modify}">
       <input type="hidden" name="uid" th:value="${user.id}"/>
       <div>

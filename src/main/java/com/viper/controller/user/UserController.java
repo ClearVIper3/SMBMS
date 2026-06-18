@@ -1,6 +1,7 @@
 package com.viper.controller.user;
 
 import com.mysql.cj.util.StringUtils;
+import com.viper.exception.BusinessException;
 import com.viper.pojo.Role;
 import com.viper.pojo.User;
 import com.viper.service.role.RoleService;
@@ -205,14 +206,19 @@ public class UserController{
         User currentUser = (User) session.getAttribute(Constants.USER_SESSION);
         user.setCreatedBy(currentUser.getId());
 
-        Boolean flag = userService.add(user);
-
-        if (flag) {
-            return "redirect:/user/list";
-        } else {
+        try {
+            Boolean flag = userService.add(user);
+            if (flag) {
+                return "redirect:/user/list";
+            }
             model.addAttribute("error", "添加用户失败");
-            return "user/add";
+        } catch (BusinessException e) {
+            // 唯一键冲突（员工编码重复）、外键冲突（角色不存在）等友好提示
+            model.addAttribute("error", e.getMessage());
         }
+        // 回填已输入内容，避免用户重新填写
+        model.addAttribute("user", user);
+        return "user/add";
     }
 
     @GetMapping("/delete")
@@ -289,14 +295,17 @@ public class UserController{
         user.setModifyBy(currentUser.getId());
         user.setModifyDate(new Date());
 
-        Boolean flag = userService.modify(user);
-
-        if (flag) {
-            return "redirect:/user/list";
-        } else {
+        try {
+            Boolean flag = userService.modify(user);
+            if (flag) {
+                return "redirect:/user/list";
+            }
             model.addAttribute("error", "修改用户失败");
-            return "user/modify";
+        } catch (BusinessException e) {
+            model.addAttribute("error", e.getMessage());
         }
+        model.addAttribute("user", user);
+        return "user/modify";
     }
 
     @GetMapping("/pwdmodify")

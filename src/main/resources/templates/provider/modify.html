@@ -11,6 +11,9 @@
         <span>供应商管理页面 >> 供应商修改页</span>
     </div>
     <div class="providerAdd">
+        <div th:if="${error}" style="color:#fff;background:#e74c3c;padding:10px 15px;margin:10px 0;border-radius:4px;">
+            <strong>提示：</strong><span th:text="${error}"></span>
+        </div>
         <form id="providerForm" name="providerForm" method="post" th:action="@{/provider/modify}">
             <input type="hidden" name="id" th:value="${provider.id}">
             <!--div的class 为error是验证错误，ok是验证成功-->

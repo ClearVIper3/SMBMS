@@ -11,32 +11,36 @@
         <span>订单管理页面 >> 订单添加页面</span>
     </div>
     <div class="providerAdd">
+        <!-- 后端错误提示：订单编码重复、供应商不存在等 -->
+        <div th:if="${error}" style="color:#fff;background:#e74c3c;padding:10px 15px;margin:10px 0;border-radius:4px;">
+            <strong>提示：</strong><span th:text="${error}"></span>
+        </div>
         <form id="billForm" name="billForm" method="post" th:action="@{/bill/add}">
             <!--div的class 为error是验证错误，ok是验证成功-->
             <div class="">
                 <label for="billCode">订单编码：</label>
-                <input type="text" name="billCode" class="text" id="billCode" value="">
+                <input type="text" name="billCode" class="text" id="billCode" th:value="${bill != null} ? ${bill.billCode} : ''">
                 <!-- 放置提示信息 -->
                 <font color="red"></font>
             </div>
             <div>
                 <label for="productName">商品名称：</label>
-                <input type="text" name="productName" id="productName" value="">
+                <input type="text" name="productName" id="productName" th:value="${bill != null} ? ${bill.productName} : ''">
                 <font color="red"></font>
             </div>
             <div>
                 <label for="productUnit">商品单位：</label>
-                <input type="text" name="productUnit" id="productUnit" value="">
+                <input type="text" name="productUnit" id="productUnit" th:value="${bill != null} ? ${bill.productUnit} : ''">
                 <font color="red"></font>
             </div>
             <div>
                 <label for="productCount">商品数量：</label>
-                <input type="text" name="productCount" id="productCount" value="">
+                <input type="text" name="productCount" id="productCount" th:value="${bill != null} ? ${bill.productCount} : ''">
                 <font color="red"></font>
             </div>
             <div>
                 <label for="totalPrice">总金额：</label>
-                <input type="text" name="totalPrice" id="totalPrice" value="">
+                <input type="text" name="totalPrice" id="totalPrice" th:value="${bill != null} ? ${bill.totalPrice} : ''">
                 <font color="red"></font>
             </div>
             <div>

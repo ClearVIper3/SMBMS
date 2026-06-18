@@ -11,6 +11,9 @@
     <span>订单管理页面 >> 订单修改页面</span>
   </div>
   <div class="providerAdd">
+    <div th:if="${error}" style="color:#fff;background:#e74c3c;padding:10px 15px;margin:10px 0;border-radius:4px;">
+      <strong>提示：</strong><span th:text="${error}"></span>
+    </div>
     <form id="billForm" name="billForm" method="post" th:action="@{/bill/modify}">
       <input type="hidden" name="id" th:value="${bill.id}">
       <!--div的class 为error是验证错误，ok是验证成功-->
