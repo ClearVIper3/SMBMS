@@ -3,6 +3,7 @@ package com.viper.controller.user;
 import com.viper.pojo.User;
 import com.viper.service.user.UserService;
 import com.viper.utils.Constants;
+import com.viper.utils.PasswordUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +29,10 @@ public class LoginController{
             HttpSession session,
             Model model) {
 
-        // 和数据库的密码进行比较，调用业务层
+        // 和数据库的密码进行比较，调用业务层（使用 BCrypt 校验，而非明文比较）
         User user = userService.Login(userCode);
 
-        if (user != null && user.getUserPassword().equals(password)) {
+        if (user != null && PasswordUtil.matches(password, user.getUserPassword())) {
             // 查有此人，将此人信息存入Session
             session.setAttribute(Constants.USER_SESSION, user);
             // 重定向到主页

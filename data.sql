@@ -68,7 +68,7 @@ CREATE TABLE `smbms_user` (
     `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT '主键id',
     `userCode`     varchar(15)  NOT NULL COMMENT '用户编码/员工唯一标识（唯一）',
     `userName`     varchar(15)  NOT NULL COMMENT '用户名字',
-    `userPassword` varchar(20)  NOT NULL COMMENT '用户密码',
+    `userPassword` varchar(100) NOT NULL COMMENT '用户密码(BCrypt加密哈希，非明文)',
     `gender`       int          DEFAULT NULL COMMENT '性别(1:男 2:女)',
     `birthday`     date         DEFAULT NULL COMMENT '出生日期',
     `phone`        varchar(20)  DEFAULT NULL COMMENT '电话',
@@ -85,6 +85,11 @@ CREATE TABLE `smbms_user` (
     KEY `idx_user_modifyBy` (`modifyBy`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
+/*
+ * 说明：以下为初始种子数据，密码以明文 '123456' 写入仅为便于初始化阅读。
+ * 应用启动时 PasswordMigrationRunner 会自动将其加密为 BCrypt 哈希后回写，
+ * 运行后数据库中不会再以明文形式存储任何密码。
+ */
 insert into `smbms_user`(`id`,`userCode`,`userName`,`userPassword`,`gender`,`birthday`,`phone`,`address`,`userRole`,`createdBy`,`creationDate`,`modifyBy`,`modifyDate`) values
 (1,'U001','张三','123456',1,'2025-09-27','13800000001','广州天河',2,1,'2025-09-19 10:49:36',4,'2025-09-27 17:34:06'),
 (2,'U002','李四','123456',1,'2025-10-02','13800000002','深圳南山',2,1,'2025-09-19 10:49:36',4,'2025-10-02 17:43:13'),

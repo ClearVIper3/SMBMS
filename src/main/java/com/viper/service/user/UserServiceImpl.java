@@ -6,6 +6,7 @@ import com.viper.dao.user.UserMapper;
 import com.viper.exception.BusinessException;
 import com.viper.exception.DbExceptionTranslator;
 import com.viper.pojo.User;
+import com.viper.utils.PasswordUtil;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
@@ -48,7 +49,8 @@ public class UserServiceImpl implements UserService {
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
 
         updateWrapper.eq("id",id);
-        updateWrapper.set("userPassword",password);
+        // 新密码加密后再存储，数据库中不保存明文
+        updateWrapper.set("userPassword", PasswordUtil.encode(password));
 
         return userMapper.update(updateWrapper) > 0;
     }

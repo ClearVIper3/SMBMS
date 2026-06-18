@@ -8,6 +8,7 @@ import com.viper.service.role.RoleService;
 import com.viper.service.user.UserService;
 import com.viper.utils.Constants;
 import com.viper.utils.PageSupport;
+import com.viper.utils.PasswordUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,7 +77,8 @@ public class UserController{
             resultMap.put("result", "error");
         } else {
             String userPassword = ((User) o).getUserPassword();
-            if (userPassword.equals(oldPassword)) {
+            // 使用 BCrypt 校验旧密码，而非明文比较
+            if (PasswordUtil.matches(oldPassword, userPassword)) {
                 resultMap.put("result", "true");
             } else {
                 resultMap.put("result", "false");
@@ -189,7 +191,8 @@ public class UserController{
         User user = new User();
         user.setUserCode(userCode);
         user.setUserName(userName);
-        user.setUserPassword(userPassword);
+        // 密码加密存储，数据库中不保存明文
+        user.setUserPassword(PasswordUtil.encode(userPassword));
         user.setAddress(address);
         user.setGender(Integer.valueOf(gender));
         user.setPhone(phone);

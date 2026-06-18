@@ -58,6 +58,12 @@
       <version>8.0.33</version>
     </dependency>
 
+    <!-- 仅引入 Spring Security 的加密工具模块(BCrypt)，不引入整个安全框架 -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
