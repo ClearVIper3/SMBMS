@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -20,8 +20,7 @@ public class RoleApiController {
     }
 
     @GetMapping
-    public Result list() {
-        return Result.success(roleService.getRoleList().stream()
-                .map(RoleDTO::fromEntity).collect(Collectors.toList()));
+    public Result<List<RoleDTO>> list() {
+        return Result.success(roleService.getRoleList().stream().map(RoleDTO::fromEntity).toList());
     }
 }

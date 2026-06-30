@@ -1,5 +1,7 @@
 package com.viper.service.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.viper.config.ai.AiProperties;
 import com.viper.pojo.AiChatMessage;
@@ -21,8 +23,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.Map;
 
 /**
  * AI 对话核心服务（流式 + Tool Calling 循环）。
@@ -74,11 +77,8 @@ public class AiChatService {
         }
         // 捕获当前线程的登录上下文，方便工具回调里恢复（streaming 回调在异步线程）
         final UserContext.CurrentUser currentUser = UserContext.require();
-
         List<ChatMessage> history = buildHistory(sessionId, userQuestion);
-        StringBuilder assistantBuffer = new StringBuilder();
-
-        runStreamingRound(emitter, currentUser, sessionId, history, assistantBuffer, 0);
+        runStreamingRound(emitter, currentUser, sessionId, history, new StringBuilder(), 0);
     }
 
     private void runStreamingRound(SseEmitter emitter,
@@ -91,7 +91,6 @@ public class AiChatService {
             sendError(emitter, "工具调用轮次超过上限（" + MAX_TOOL_ROUNDS + "），中止本次回答");
             return;
         }
-
         OpenAiStreamingChatModel model = modelProvider.getObject();
 
         model.generate(messages, toolRegistry.specifications(), new StreamingResponseHandler<>() {
@@ -103,20 +102,13 @@ public class AiChatService {
 
             @Override public void onComplete(Response<AiMessage> response) {
                 AiMessage ai = response.content();
-
                 if (ai.hasToolExecutionRequests()) {
-                    // ============ 工具调用回合 ============
                     messages.add(ai);
-                    List<ToolExecutionResultMessage> results = new ArrayList<>();
                     for (ToolExecutionRequest req : ai.toolExecutionRequests()) {
-                        ToolExecutionResultMessage r = executeTool(currentUser, sessionId, req, emitter);
-                        results.add(r);
-                        messages.add(r);
+                        messages.add(executeTool(currentUser, sessionId, req, emitter));
                     }
-                    // 进入下一轮，把工具结果回灌给模型
                     runStreamingRound(emitter, currentUser, sessionId, messages, assistantBuffer, round + 1);
                 } else {
-                    // ============ 最终文本回答 ============
                     String full = ai.text() != null ? ai.text() : assistantBuffer.toString();
                     try {
                         conversationService.saveMessage(sessionId, "assistant", full);
@@ -142,7 +134,7 @@ public class AiChatService {
                                                     SseEmitter emitter) {
         String name = req.name();
         String args = req.arguments();
-        sendEvent(emitter, "tool_call", "{\"name\":\"" + name + "\",\"arguments\":" + (args == null ? "null" : args) + "}");
+        sendEvent(emitter, "tool_call", toolEventJson(name, "arguments", parseJson(args)));
 
         try {
             // 回调发生在 LangChain4j 的异步线程，需要恢复登录上下文
@@ -151,16 +143,18 @@ public class AiChatService {
             if (executor == null) {
                 String denied = "{\"error\":\"工具未在白名单内: " + name + "\"}";
                 conversationService.saveMessageWithTool(sessionId, "tool", denied, name, args, denied);
+                sendEvent(emitter, "tool_result", toolEventJson(name, "result", parseJson(denied)));
                 return ToolExecutionResultMessage.from(req, denied);
             }
             String result = executor.execute(req, "ai-chat-" + sessionId);
             conversationService.saveMessageWithTool(sessionId, "tool", result, name, args, result);
-            sendEvent(emitter, "tool_result", "{\"name\":\"" + name + "\",\"result\":" + jsonStringify(result) + "}");
+            sendEvent(emitter, "tool_result", toolEventJson(name, "result", parseJson(result)));
             return ToolExecutionResultMessage.from(req, result);
         } catch (Exception ex) {
             log.error("工具执行失败 name={}", name, ex);
             String err = "{\"error\":\"" + ex.getMessage() + "\"}";
             conversationService.saveMessageWithTool(sessionId, "tool", err, name, args, err);
+            sendEvent(emitter, "tool_result", toolEventJson(name, "result", parseJson(err)));
             return ToolExecutionResultMessage.from(req, err);
         } finally {
             UserContext.clear();
@@ -180,15 +174,14 @@ public class AiChatService {
             switch (m.getRole()) {
                 case "user"      -> result.add(UserMessage.from(m.getContent()));
                 case "assistant" -> result.add(AiMessage.from(m.getContent()));
-                // 工具调用消息不回灌（避免协议复杂度），让模型基于已有结论继续即可
-                default          -> { /* skip system / tool */ }
+                default          -> { /* skip system / tool —— 不回灌避免协议复杂度 */ }
             }
         }
         result.add(UserMessage.from(userQuestion));
         return result;
     }
 
-    // ---------------- SSE helpers ----------------
+    // ---------------- SSE & JSON helpers ----------------
 
     private void sendEvent(SseEmitter emitter, String name, String data) {
         try {
@@ -205,11 +198,27 @@ public class AiChatService {
         } catch (IOException ignored) { }
     }
 
-    private static String jsonStringify(String raw) {
-        try { return JSON.writeValueAsString(raw); }
-        catch (Exception e) { return "\"\""; }
+    /**
+     * 构造 {"name": <name>, <payloadKey>: <payload>} 的 JSON。
+     * payload 可以是 Map / List / String / Number 等任何 Jackson 可序列化对象，
+     * 前端拿到的就是一个干净的对象（不会被双层 escape）。
+     */
+    private static String toolEventJson(String name, String payloadKey, Object payload) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("name", name);
+        m.put(payloadKey, payload);
+        try { return JSON.writeValueAsString(m); }
+        catch (JsonProcessingException e) { return "{\"name\":\"" + name + "\"}"; }
     }
 
-    /** 暴露给 Controller 用于"重新生成"——异步触发流，但当前已通过 stream() 复用 */
-    public CompletableFuture<Void> noop() { return CompletableFuture.completedFuture(null); }
+    /** 尽力解析为 JsonNode；解析失败回退为字符串 raw，避免前端拿到双层 escape */
+    private static Object parseJson(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        try {
+            JsonNode node = JSON.readTree(raw);
+            return node;
+        } catch (Exception e) {
+            return raw;
+        }
+    }
 }

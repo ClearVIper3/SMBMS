@@ -1,62 +1,22 @@
 package com.viper.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * 统一响应结果类
+ * 统一 API 响应结构。
+ * <p>
+ * 用不可变 record，序列化后字段顺序稳定（code / message / data），类型安全；
+ * 取代了原先继承 HashMap 的写法（无法获取强类型 data、易拼写错 key）。
  */
-public class Result extends HashMap<String, Object> {
-    
-    private static final String CODE = "code";
-    private static final String MESSAGE = "message";
-    private static final String DATA = "data";
-    
-    public Result() {
-    }
-    
-    public Result(int code, String message) {
-        this.put(CODE, code);
-        this.put(MESSAGE, message);
-    }
-    
-    public Result(int code, String message, Object data) {
-        this.put(CODE, code);
-        this.put(MESSAGE, message);
-        this.put(DATA, data);
-    }
-    
-    public static Result success() {
-        return new Result(200, "操作成功");
-    }
-    
-    public static Result success(String message) {
-        return new Result(200, message);
-    }
-    
-    public static Result success(Object data) {
-        return new Result(200, "操作成功", data);
-    }
-    
-    public static Result success(String message, Object data) {
-        return new Result(200, message, data);
-    }
-    
-    public static Result error() {
-        return new Result(500, "操作失败");
-    }
-    
-    public static Result error(String message) {
-        return new Result(500, message);
-    }
-    
-    public static Result error(int code, String message) {
-        return new Result(code, message);
-    }
-    
-    public Result put(String key, Object value) {
-        super.put(key, value);
-        return this;
-    }
-}
+public record Result<T>(int code, String message, T data) {
 
+    private static final int OK = 200;
+    private static final int ERR = 500;
+
+    public static <T> Result<T> success() { return new Result<>(OK, "操作成功", null); }
+    public static <T> Result<T> success(T data) { return new Result<>(OK, "操作成功", data); }
+    public static <T> Result<T> success(String message, T data) { return new Result<>(OK, message, data); }
+    public static Result<String> successMsg(String message) { return new Result<>(OK, message, null); }
+
+    public static <T> Result<T> error() { return new Result<>(ERR, "操作失败", null); }
+    public static <T> Result<T> error(String message) { return new Result<>(ERR, message, null); }
+    public static <T> Result<T> error(int code, String message) { return new Result<>(code, message, null); }
+}

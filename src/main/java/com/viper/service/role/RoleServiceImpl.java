@@ -3,12 +3,10 @@ package com.viper.service.role;
 import com.viper.dao.role.RoleMapper;
 import com.viper.pojo.Role;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service("roleService")
-@Transactional
+@Service
 public class RoleServiceImpl implements RoleService {
 
     private final RoleMapper roleMapper;

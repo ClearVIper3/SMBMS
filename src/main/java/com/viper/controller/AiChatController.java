@@ -10,7 +10,6 @@ import com.viper.service.ai.AiChatService;
 import com.viper.service.ai.ConversationService;
 import com.viper.utils.Result;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,20 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * AI 助手 REST 接口。
- *  GET    /api/ai/sessions                  列出我的会话
- *  POST   /api/ai/sessions                  新建会话
- *  DELETE /api/ai/sessions/{id}             删除会话
- *  GET    /api/ai/sessions/{id}/messages    历史消息
- *  POST   /api/ai/sessions/{id}/messages    提问（SSE 流式响应）
- *  POST   /api/ai/sessions/{id}/regenerate  重新生成（基于上一条 user 消息）
- *  GET    /api/ai/status                    AI 是否可用
- */
+/** AI 助手 REST 接口（会话管理 + SSE 流式对话）。 */
 @RestController
 @RequestMapping("/api/ai")
 public class AiChatController {
@@ -44,87 +37,85 @@ public class AiChatController {
     private final ConversationService conversationService;
     private final AiChatService aiChatService;
 
-    /** 独立线程池跑流式生成，避免占用 Servlet 容器线程 */
-    private final ExecutorService aiExecutor = Executors.newCachedThreadPool(r -> {
-        Thread t = new Thread(r, "ai-stream");
-        t.setDaemon(true);
-        return t;
-    });
+    /**
+     * 流式生成专用线程池：有界、可拒绝、daemon。
+     * 避免 newCachedThreadPool 无界创建线程在高并发下打挂 JVM。
+     */
+    private final ExecutorService aiExecutor;
 
     public AiChatController(ConversationService conversationService, AiChatService aiChatService) {
         this.conversationService = conversationService;
         this.aiChatService = aiChatService;
+
+        AtomicInteger seq = new AtomicInteger();
+        this.aiExecutor = new ThreadPoolExecutor(
+                4, 32, 60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(64),
+                r -> {
+                    Thread t = new Thread(r, "ai-stream-" + seq.incrementAndGet());
+                    t.setDaemon(true);
+                    return t;
+                },
+                new ThreadPoolExecutor.AbortPolicy());
     }
 
     @GetMapping("/status")
-    public Result status() {
-        return Result.success(java.util.Map.of("enabled", aiChatService.enabled()));
+    public Result<Map<String, Boolean>> status() {
+        return Result.success(Map.of("enabled", aiChatService.enabled()));
     }
 
     // ---------------- 会话管理 ----------------
 
     @GetMapping("/sessions")
-    public Result listSessions() {
-        List<AiSessionDTO> data = conversationService.listMySessions().stream()
-                .map(AiSessionDTO::from).collect(Collectors.toList());
-        return Result.success(data);
+    public Result<List<AiSessionDTO>> listSessions() {
+        return Result.success(conversationService.listMySessions().stream().map(AiSessionDTO::from).toList());
     }
 
     @PostMapping("/sessions")
-    public Result createSession(@RequestBody(required = false) AiSessionDTO body) {
+    public Result<AiSessionDTO> createSession(@RequestBody(required = false) AiSessionDTO body) {
         Long uid = UserContext.require().getId();
-        String title = body == null ? null : body.getTitle();
-        AiChatSession s = conversationService.createSession(uid, title);
+        AiChatSession s = conversationService.createSession(uid, body == null ? null : body.getTitle());
         return Result.success(AiSessionDTO.from(s));
     }
 
     @DeleteMapping("/sessions/{id}")
-    public Result deleteSession(@PathVariable("id") Long id) {
+    public Result<String> deleteSession(@PathVariable("id") Long id) {
         conversationService.deleteSession(id);
-        return Result.success("已删除");
+        return Result.successMsg("已删除");
     }
 
     @GetMapping("/sessions/{id}/messages")
-    public Result listMessages(@PathVariable("id") Long id) {
-        List<AiMessageDTO> list = conversationService.listMessages(id).stream()
-                .map(AiMessageDTO::from).collect(Collectors.toList());
-        return Result.success(list);
+    public Result<List<AiMessageDTO>> listMessages(@PathVariable("id") Long id) {
+        return Result.success(conversationService.listMessages(id).stream().map(AiMessageDTO::from).toList());
     }
 
     // ---------------- 对话（SSE） ----------------
 
     @PostMapping(value = "/sessions/{id}/messages", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chat(@PathVariable("id") Long sessionId, @RequestBody AiChatRequest req) {
-        AiChatSession session = conversationService.requireOwnedSession(sessionId);
+        conversationService.requireOwnedSession(sessionId);
         String question = req == null ? null : req.getMessage();
         if (question == null || question.isBlank()) {
             throw new IllegalArgumentException("message 不能为空");
         }
-        // 1) 用户消息先落库 2) 默认标题自动改为首问 3) 异步流式生成
         conversationService.saveMessage(sessionId, "user", question);
         conversationService.renameIfDefault(sessionId, question);
-
         return startStream(sessionId, question);
     }
 
     @PostMapping(value = "/sessions/{id}/regenerate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter regenerate(@PathVariable("id") Long sessionId) {
         conversationService.requireOwnedSession(sessionId);
-        // 删掉最后一条 assistant，再以倒数第二条 user 作为输入重新提问
         conversationService.deleteLastAssistantMessage(sessionId);
+
         List<AiChatMessage> all = conversationService.listMessages(sessionId);
         AiChatMessage lastUser = null;
         for (int i = all.size() - 1; i >= 0; i--) {
             if ("user".equals(all.get(i).getRole())) { lastUser = all.get(i); break; }
         }
-        if (lastUser == null) {
-            throw new IllegalArgumentException("当前会话没有可重新生成的用户消息");
-        }
-        // 把 user 从 buildHistory 里再次带进去（不再二次落库）
-        return startStreamWithoutPersistUser(sessionId, lastUser.getContent());
+        if (lastUser == null) throw new IllegalArgumentException("当前会话没有可重新生成的用户消息");
+        return startStream(sessionId, lastUser.getContent());
     }
-
-    // ---------------- helpers ----------------
 
     private SseEmitter startStream(Long sessionId, String question) {
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT_MS);
@@ -140,9 +131,5 @@ public class AiChatController {
         emitter.onTimeout(emitter::complete);
         emitter.onError(t -> emitter.complete());
         return emitter;
-    }
-
-    private SseEmitter startStreamWithoutPersistUser(Long sessionId, String question) {
-        return startStream(sessionId, question);
     }
 }

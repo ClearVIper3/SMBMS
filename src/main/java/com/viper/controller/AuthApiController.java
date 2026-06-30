@@ -17,12 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 鉴权相关接口（登录、登出、获取当前用户、改密）。
- * <p>
- * 旧 LoginController/LogoutController 保持不变，作为 Thymeleaf 入口；
- * 本类是面向 Vue 前端的 REST 版本，复用同一 Service 层确保业务行为一致。
- */
+/** 鉴权 REST 接口：登录、登出、获取当前用户、改密。 */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthApiController {
@@ -36,58 +31,59 @@ public class AuthApiController {
     }
 
     @PostMapping("/login")
-    public Result login(@RequestBody LoginRequest req) {
+    public Result<LoginResponse> login(@RequestBody LoginRequest req) {
         if (!StringUtils.hasLength(req.getUserCode()) || !StringUtils.hasLength(req.getUserPassword())) {
             throw new BusinessException("用户名或密码不能为空");
         }
         User u = userService.Login(req.getUserCode());
         if (u == null || !PasswordUtil.matches(req.getUserPassword(), u.getUserPassword())) {
-            // 与旧 LoginController "用户名或密码错误" 保持一致的提示
             throw new BusinessException("用户名或密码错误");
         }
-        String token = jwtService.issue(u.getId(), u.getUserCode(), u.getUserName(), u.getUserRole());
-
-        LoginResponse resp = new LoginResponse();
-        resp.setToken(token);
-        resp.setUserId(u.getId());
-        resp.setUserCode(u.getUserCode());
-        resp.setUserName(u.getUserName());
-        resp.setRoleId(u.getUserRole());
-        return Result.success(resp);
+        return Result.success(toLoginResponse(u,
+                jwtService.issue(u.getId(), u.getUserCode(), u.getUserName(), u.getUserRole())));
     }
 
     /**
-     * JWT 是无状态的，"登出"接口实际只起前端清理 token 的语义占位。
-     * 真正的失效需要前端丢弃 token；如未来需要服务端强制吊销，可引入黑名单表。
+     * JWT 是无状态的，"登出"只起前端清理 token 的语义占位；
+     * 若未来需要服务端强制吊销，可引入黑名单表。
      */
     @PostMapping("/logout")
-    public Result logout() {
-        return Result.success("已登出");
+    public Result<String> logout() {
+        return Result.successMsg("已登出");
     }
 
     @GetMapping("/me")
-    public Result me() {
+    public Result<LoginResponse> me() {
         UserContext.CurrentUser u = UserContext.require();
-        LoginResponse resp = new LoginResponse();
-        resp.setUserId(u.getId());
-        resp.setUserCode(u.getUserCode());
-        resp.setUserName(u.getUserName());
-        resp.setRoleId(u.getRoleId());
-        return Result.success(resp);
+        LoginResponse r = new LoginResponse();
+        r.setUserId(u.getId());
+        r.setUserCode(u.getUserCode());
+        r.setUserName(u.getUserName());
+        r.setRoleId(u.getRoleId());
+        return Result.success(r);
     }
 
     @PostMapping("/password")
-    public Result modifyPassword(@RequestBody PasswordModifyRequest req) {
+    public Result<String> modifyPassword(@RequestBody PasswordModifyRequest req) {
+        if (!StringUtils.hasLength(req.getNewPassword())) throw new BusinessException("新密码不能为空");
         UserContext.CurrentUser cu = UserContext.require();
-        if (!StringUtils.hasLength(req.getNewPassword())) {
-            throw new BusinessException("新密码不能为空");
-        }
-        // 校验旧密码（与旧 /user/pwdmodify/check + /user/pwdmodify 两步合并）
         User current = userService.getUserById(String.valueOf(cu.getId()));
         if (current == null || !PasswordUtil.matches(req.getOldPassword(), current.getUserPassword())) {
             throw new BusinessException("原密码错误");
         }
-        boolean ok = userService.PasswordModify(cu.getId(), req.getNewPassword());
-        return ok ? Result.success("修改成功，请重新登录") : Result.error("修改密码失败");
+        if (!userService.PasswordModify(cu.getId(), req.getNewPassword())) {
+            throw new BusinessException("修改密码失败");
+        }
+        return Result.successMsg("修改成功，请重新登录");
+    }
+
+    private static LoginResponse toLoginResponse(User u, String token) {
+        LoginResponse r = new LoginResponse();
+        r.setToken(token);
+        r.setUserId(u.getId());
+        r.setUserCode(u.getUserCode());
+        r.setUserName(u.getUserName());
+        r.setRoleId(u.getUserRole());
+        return r;
     }
 }
