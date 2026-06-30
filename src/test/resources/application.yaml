@@ -1,0 +1,39 @@
+# 测试专用配置：H2 内存数据库（MySQL 兼容模式）+ 关闭 Flyway
+server:
+  port: 0
+  servlet:
+    context-path: /smbms
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:smbms_test;MODE=MySQL;DATABASE_TO_LOWER=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-h2.sql
+      data-locations: classpath:data-h2.sql
+
+  # 测试期关闭 Flyway：生产 V1__init_schema.sql 含 MySQL 专属语法（DELIMITER / 存储过程），
+  # H2 即便 MODE=MySQL 也无法执行；测试期由上面的 schema-h2.sql / data-h2.sql 直接初始化。
+  flyway:
+    enabled: false
+
+mybatis-plus:
+  type-aliases-package: com.viper.pojo
+  mapper-locations: classpath:com/viper/dao/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: false
+
+smbms:
+  jwt:
+    secret: test-only-secret-key-32-bytes-minimum-length-padding-padding
+    ttl-seconds: 3600
+
+logging:
+  level:
+    com:
+      viper: INFO

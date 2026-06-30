@@ -8,23 +8,30 @@
   <groupId>org.example</groupId>
   <artifactId>SMBMS</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>  <!-- 改为jar，使用内嵌Tomcat -->
-  <name>SMBMS Spring Boot</name>
+  <packaging>jar</packaging>
+  <name>SMBMS Backend (REST API)</name>
 
-  <!-- Spring Boot父项目 -->
+  <!-- ============================================================
+       现代化后的纯 REST 后端：
+         - Java 21 LTS
+         - Spring Boot 3.3.5
+         - MyBatis-Plus 3.5.7（SB3 专用 starter）
+         - Flyway 10 + MySQL 模块
+         - 已彻底移除：Thymeleaf、Session 鉴权、旧 Controller 与静态资源
+       =========================================================== -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.18</version>  <!-- 兼容Java 8的稳定版本 -->
+    <version>3.3.5</version>
   </parent>
 
   <properties>
-    <java.version>8</java.version>
+    <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <mybatis-plus.version>3.5.7</mybatis-plus.version>
   </properties>
 
   <dependencies>
-    <!-- Spring Boot Starters -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -40,25 +47,17 @@
       <artifactId>spring-boot-starter-aop</artifactId>
     </dependency>
 
-    <!-- Thymeleaf支持 -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>com.baomidou</groupId>
-      <artifactId>mybatis-plus-boot-starter</artifactId>
-      <version>3.5.14</version>
+      <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+      <version>${mybatis-plus.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.33</version>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
     </dependency>
 
-    <!-- 仅引入 Spring Security 的加密工具模块(BCrypt)，不引入整个安全框架 -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-crypto</artifactId>
@@ -70,15 +69,18 @@
     </dependency>
 
     <dependency>
-      <groupId>com.alibaba.fastjson2</groupId>
-      <artifactId>fastjson2</artifactId>
-      <version>2.0.58</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
     </dependency>
 
     <dependency>
@@ -86,8 +88,12 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-    <!-- 开发工具 (热部署) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
@@ -99,7 +105,6 @@
   <build>
     <finalName>SMBMS</finalName>
     <plugins>
-      <!-- Spring Boot Maven插件 -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -113,14 +118,12 @@
         </configuration>
       </plugin>
 
-      <!-- 编译插件 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
         <configuration>
-          <source>8</source>
-          <target>8</target>
+          <source>21</source>
+          <target>21</target>
           <encoding>UTF-8</encoding>
           <annotationProcessorPaths>
             <path>

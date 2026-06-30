@@ -50,3 +50,11 @@ Thumbs.db
 # Logs
 *.log
 
+# 本地敏感配置 / 环境变量文件（保留 .env.example 作为模板）
+.env
+.env.*
+!.env.example
+application-local.yaml
+application-local.yml
+
+
