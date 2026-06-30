@@ -76,9 +76,18 @@ npm run dev
 - 用户名 `admin`，密码 `123456`
 - 启动时 `PasswordMigrationRunner` 会把明文密码自动升级为 BCrypt 哈希；之后数据库中不再存明文。
 
+## AI 助手
+
+内置基于 LangChain4j 的 AI 智能助手，支持自然语言查询业务数据（用户/订单/供应商/库存预警/销售统计），通过 Tool Calling 机制安全调用业务接口。详见 `AI_README.md`。
+
+```
+SMBMS_AI_API_KEY=sk-xxxxx 配置后启动 → 菜单进入「🤖 AI 助手」
+```
+
 ## 文档索引
 
 - `MIGRATION.md` — 现代化重构看板 + 新旧架构对比 + 后续优化建议
 - `MIGRATION_DB.md` — Flyway 在不同库环境下的接入手册
+- `AI_README.md` — AI 助手模块（架构、安全模型、Tool Calling 流程、API、扩展指南）
 - `frontend/README.md` — 前端开发与构建说明
 - `.env.example` — 环境变量模板

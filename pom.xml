@@ -29,6 +29,7 @@
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mybatis-plus.version>3.5.7</mybatis-plus.version>
+    <langchain4j.version>0.35.0</langchain4j.version>
   </properties>
 
   <dependencies>
@@ -81,6 +82,22 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-mysql</artifactId>
+    </dependency>
+
+    <!-- =====================================================
+         LangChain4j：AI 编排（Tool Calling + ChatMemory + Streaming）
+         选 0.35.0 的原因：当前对 Java21 + SB3.3 兼容性最稳；
+         供应商走 OpenAI 兼容协议（DashScope/DeepSeek/Moonshot/OpenAI 通吃）。
+         ===================================================== -->
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j</artifactId>
+      <version>${langchain4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j-open-ai</artifactId>
+      <version>${langchain4j.version}</version>
     </dependency>
 
     <dependency>

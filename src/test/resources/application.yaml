@@ -32,6 +32,17 @@ smbms:
   jwt:
     secret: test-only-secret-key-32-bytes-minimum-length-padding-padding
     ttl-seconds: 3600
+  ai:
+    # 测试期默认关闭 AI（不依赖外部网络/key）；
+    # 想跑 AI 集成测试时再通过环境变量打开并提供 key。
+    enabled: false
+    base-url: http://localhost:0
+    api-key: test
+    model: test-model
+    temperature: 0.0
+    memory-window: 5
+    timeout-seconds: 5
+    system-prompt: "test"
 
 logging:
   level:

@@ -22,6 +22,7 @@ async function logout() {
         <el-menu-item index="/users">用户管理</el-menu-item>
         <el-menu-item index="/bills">订单管理</el-menu-item>
         <el-menu-item index="/providers">供应商管理</el-menu-item>
+        <el-menu-item index="/ai">🤖 AI 助手</el-menu-item>
         <el-menu-item index="/password">修改密码</el-menu-item>
       </el-menu>
     </el-aside>

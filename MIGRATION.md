@@ -34,6 +34,7 @@
 | 4 | Vue3 + TS 前端 | 🟢 完成 |
 | 5 | 容器化、CI/CD | 🟢 完成 |
 | 6 | 旧 Thymeleaf 体系一次性下线（全局改观） | 🟢 完成 |
+| 7 | AI 智能助手（LangChain4j Tool Calling + SSE + Vue 聊天 UI） | 🟢 完成 |
 
 图例：⚪ 待开始 / 🟡 进行中 / 🟢 已完成 / 🔴 阻塞
 
@@ -98,6 +99,15 @@
   * 启动类重命名：`SpringbootApplication` → `SmbmsApplication`
   * 全局异常处理 `basePackages` 收口到 `com.viper.controller`
   * README 全面重写，移除旧 UI 截图说明
+- 2026-06-30 阶段 7 完成（AI 智能助手）：
+  * 引入 LangChain4j 0.35.0 + langchain4j-open-ai（OpenAI 兼容协议，默认指向通义千问，可一键换 DeepSeek/Moonshot/OpenAI）
+  * 新表：`ai_chat_session` / `ai_chat_message`（Flyway V2，含外键 ON DELETE CASCADE）
+  * 5 个 @Tool 工具（白名单 Tool Calling，物理上无法触达写操作）：getUserInfo/listUsers、listProviders/getProviderInfo、listOrders/getOrderInfo、getLowStockProducts、getSalesStatistics
+  * `AiChatService`：流式生成 + 多轮工具调用循环（MAX_TOOL_ROUNDS=5 防死循环）
+  * `AiChatController`：7 个 REST 接口 + SSE 流式响应（event: delta/tool_call/tool_result/error/done）
+  * Vue3 `AiAssistant.vue`：会话侧边栏 + 聊天气泡 + 工具调用气泡 + 流式渲染 + 重新生成/清空/停止
+  * Nginx 已为 SSE 关闭 buffer
+  * 新增 `AI_README.md` 安全模型与扩展指南
 
 # 七、最终架构（全部改观后）
 

@@ -23,6 +23,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'providers/:id/edit', component: () => import('@/views/providers/ProviderEdit.vue') },
       { path: 'providers/:id', component: () => import('@/views/providers/ProviderView.vue') },
 
+      { path: 'ai', component: () => import('@/views/ai/AiAssistant.vue') },
+
       { path: 'password', component: () => import('@/views/PasswordModify.vue') }
     ]
   },

@@ -56,6 +56,24 @@ smbms:
     secret: ${SMBMS_JWT_SECRET:please-change-this-very-long-dev-only-secret-key-32+bytes}
     ttl-seconds: ${SMBMS_JWT_TTL:7200}
 
+  # AI 助手配置（走 OpenAI 兼容协议，默认指向阿里云 DashScope 通义千问，可换 DeepSeek/Moonshot/OpenAI）
+  ai:
+    enabled: ${SMBMS_AI_ENABLED:true}
+    base-url: ${SMBMS_AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    api-key: ${SMBMS_AI_API_KEY:}
+    model:   ${SMBMS_AI_MODEL:qwen-plus}
+    temperature: ${SMBMS_AI_TEMPERATURE:0.3}
+    # 单次会话最多保留多少条历史消息进入上下文（按消息条数滑动窗口，省 token）
+    memory-window: ${SMBMS_AI_MEMORY_WINDOW:20}
+    timeout-seconds: ${SMBMS_AI_TIMEOUT:60}
+    # 系统提示词：明确身份/能力边界/工具使用规则
+    system-prompt: |
+      你是 SMBMS 超市订单管理系统的智能助手「小商」。规则：
+      1) 你只能通过系统提供的工具（Function Calling）查询业务数据，不得编造数据；
+      2) 涉及"统计/汇总/筛选"时必须调用工具拿到真实数据后再回答；
+      3) 当用户问题无法用现有工具回答（例如要求修改/删除数据），礼貌拒绝并解释原因；
+      4) 回答用简洁的中文，必要时使用 markdown 列表或表格。
+
 logging:
   level:
     com:
