@@ -1,7 +1,7 @@
 # 一键起 SMBMS 完整环境：MySQL + 后端 REST API + 前端 SPA
-# 使用方法：
-#   docker compose up -d --build
-#   浏览器打开 http://localhost  （后端 API 在 http://localhost:8080/smbms/api）
+# 使用前请先复制 .env.example 为 .env 并填入真实密码/密钥。
+# docker compose up -d --build
+# 浏览器打开 http://localhost
 
 services:
   mysql:
@@ -9,7 +9,7 @@ services:
     container_name: smbms-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: smbms
     command:
       - --character-set-server=utf8mb4
@@ -20,7 +20,7 @@ services:
     volumes:
       - smbms-mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-123456}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -34,15 +34,19 @@ services:
     environment:
       SMBMS_DB_URL: jdbc:mysql://mysql:3306/smbms?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SMBMS_DB_USERNAME: root
-      SMBMS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
-      SMBMS_JWT_SECRET: ${SMBMS_JWT_SECRET:-please-change-this-very-long-dev-only-secret-key-32+bytes}
+      SMBMS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SMBMS_JWT_SECRET: ${SMBMS_JWT_SECRET}
       SMBMS_JWT_TTL: "7200"
+      SMBMS_AI_ENABLED: ${SMBMS_AI_ENABLED:-false}
+      SMBMS_AI_BASE_URL: ${SMBMS_AI_BASE_URL:-}
+      SMBMS_AI_API_KEY: ${SMBMS_AI_API_KEY:-}
+      SMBMS_AI_MODEL: ${SMBMS_AI_MODEL:-qwen-plus}
       TZ: Asia/Shanghai
     depends_on:
       mysql:
         condition: service_healthy
     ports:
-      - "8080:8080"   # 后端 REST API 端口；前端容器通过内部网络访问，外部直连可用于调试
+      - "8080:8080"
 
   web:
     build:

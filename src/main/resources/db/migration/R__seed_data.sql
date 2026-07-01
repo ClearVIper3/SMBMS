@@ -5,8 +5,8 @@
  - 使用 INSERT ... ON DUPLICATE KEY UPDATE 保证幂等：
      新空库：插入种子数据；
      现网库（数据已存在）：更新非关键字段而不破坏关键关联（id 不变）；
- - 种子密码以明文 '123456' 写入，应用启动时 PasswordMigrationRunner 会自动加密；
-   现网库已有 BCrypt 哈希的用户，此处的 INSERT 会被 ON DUPLICATE KEY 拦截，
+ - 种子密码已用 BCrypt 预加密存储（不存明文）；
+   现网库已有数据时，INSERT 会被 ON DUPLICATE KEY 拦截，
    不会覆盖已加密密码（更新列表里不包含 userPassword）。
 =====================================================================================
 */
@@ -19,11 +19,12 @@ ON DUPLICATE KEY UPDATE
     `roleName`     = VALUES(`roleName`),
     `creationDate` = VALUES(`creationDate`);
 
+-- 种子密码已用 BCrypt 加密存储（原文见项目 README 初始密码说明）
 INSERT INTO `smbms_user`(`id`,`userCode`,`userName`,`userPassword`,`gender`,`birthday`,`phone`,`address`,`userRole`,`createdBy`,`creationDate`,`modifyBy`,`modifyDate`) VALUES
-(1,'U001','张三','123456',1,'2025-09-27','13800000001','广州天河',2,1,'2025-09-19 10:49:36',NULL,NULL),
-(2,'U002','李四','123456',1,'2025-10-02','13800000002','深圳南山',2,1,'2025-09-19 10:49:36',NULL,NULL),
-(3,'U003','王五','123456',1,'2025-10-02','13800000003','北京朝阳',3,1,'2025-09-19 10:49:36',NULL,NULL),
-(4,'admin','管理员','123456',1,'2025-09-19','12345678901','中国',1,1,'2025-09-19 10:52:17',NULL,NULL)
+(1,'U001','张三','$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',1,'2025-09-27','13800000001','广州天河',2,1,'2025-09-19 10:49:36',NULL,NULL),
+(2,'U002','李四','$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',1,'2025-10-02','13800000002','深圳南山',2,1,'2025-09-19 10:49:36',NULL,NULL),
+(3,'U003','王五','$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',1,'2025-10-02','13800000003','北京朝阳',3,1,'2025-09-19 10:49:36',NULL,NULL),
+(4,'admin','管理员','$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',1,'2025-09-19','12345678901','中国',1,1,'2025-09-19 10:52:17',NULL,NULL)
 ON DUPLICATE KEY UPDATE
     -- 注意：故意不更新 userPassword，保护已加密的现网密码不被明文覆盖
     `userName`     = VALUES(`userName`),

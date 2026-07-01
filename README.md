@@ -71,17 +71,17 @@ npm run dev
 # http://localhost:5173 （/api 自动代理到后端）
 ```
 
-## 默认账号
+## 初始账号
 
-- 用户名 `admin`，密码 `123456`
-- 启动时 `PasswordMigrationRunner` 会把明文密码自动升级为 BCrypt 哈希；之后数据库中不再存明文。
+种子数据包含默认管理员账号 `admin`（初始密码请查看项目内部文档或联系管理员）。
+密码在数据库中以 BCrypt 哈希存储，不保存明文。
 
 ## AI 助手
 
 内置基于 LangChain4j 的 AI 智能助手，支持自然语言查询业务数据（用户/订单/供应商/库存预警/销售统计），通过 Tool Calling 机制安全调用业务接口。详见 `AI_README.md`。
 
 ```
-SMBMS_AI_API_KEY=sk-xxxxx 配置后启动 → 菜单进入「🤖 AI 助手」
+SMBMS_AI_API_KEY=<YOUR_KEY> 配置后启动 → 菜单进入「🤖 AI 助手」
 ```
 
 ## 文档索引

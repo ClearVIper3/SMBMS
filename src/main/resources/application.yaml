@@ -9,10 +9,10 @@ server:
 
 spring:
   datasource:
-    # 敏感配置外置：优先读环境变量，本地无环境变量时回落到默认值，保持零配置启动体验
-    username: ${SMBMS_DB_USERNAME:root}
-    password: ${SMBMS_DB_PASSWORD:123456}
-    url: ${SMBMS_DB_URL:jdbc:mysql://localhost:3306/smbms?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    # 必须通过环境变量注入，不提供默认值 —— 避免敏感信息进入版本库
+    username: ${SMBMS_DB_USERNAME}
+    password: ${SMBMS_DB_PASSWORD}
+    url: ${SMBMS_DB_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
     hikari:
@@ -23,14 +23,10 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
-  # 关闭 SB 自带 schema/data.sql 自动执行：Flyway 接管数据库初始化
   sql:
     init:
       mode: never
 
-  # Flyway 配置：
-  #   - baseline-on-migrate=true：若库里已有表（即"现网库"）但无 flyway_schema_history，
-  #     则不重跑 V1 基线，直接把当前状态标记为 baseline-version；这是不丢历史数据的关键。
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -52,21 +48,18 @@ mybatis-plus:
 
 smbms:
   jwt:
-    # 生产必须通过环境变量 SMBMS_JWT_SECRET 注入≥32字节随机串；默认值仅供本地开发
-    secret: ${SMBMS_JWT_SECRET:please-change-this-very-long-dev-only-secret-key-32+bytes}
+    # 必须通过环境变量 SMBMS_JWT_SECRET 注入≥32字节随机串
+    secret: ${SMBMS_JWT_SECRET}
     ttl-seconds: ${SMBMS_JWT_TTL:7200}
 
-  # AI 助手配置（走 OpenAI 兼容协议，默认指向阿里云 DashScope 通义千问，可换 DeepSeek/Moonshot/OpenAI）
   ai:
-    enabled: ${SMBMS_AI_ENABLED:true}
-    base-url: ${SMBMS_AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+    enabled: ${SMBMS_AI_ENABLED:false}
+    base-url: ${SMBMS_AI_BASE_URL:}
     api-key: ${SMBMS_AI_API_KEY:}
-    model:   ${SMBMS_AI_MODEL:qwen-plus}
+    model: ${SMBMS_AI_MODEL:qwen-plus}
     temperature: ${SMBMS_AI_TEMPERATURE:0.3}
-    # 单次会话最多保留多少条历史消息进入上下文（按消息条数滑动窗口，省 token）
     memory-window: ${SMBMS_AI_MEMORY_WINDOW:20}
     timeout-seconds: ${SMBMS_AI_TIMEOUT:60}
-    # 系统提示词：明确身份/能力边界/工具使用规则
     system-prompt: |
       你是 SMBMS 超市订单管理系统的智能助手「小商」。规则：
       1) 你只能通过系统提供的工具（Function Calling）查询业务数据，不得编造数据；

@@ -87,7 +87,7 @@ event: done         data: ""
    ```
    SMBMS_AI_ENABLED=true
    SMBMS_AI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-   SMBMS_AI_API_KEY=sk-xxxxx
+   SMBMS_AI_API_KEY=<YOUR_KEY>
    SMBMS_AI_MODEL=qwen-plus
    ```
 
